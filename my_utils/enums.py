@@ -6,16 +6,17 @@ class ImputationStatus(Enum):
   FINISHED = 'finished'
   ERROR = 'error'
 
-class SimpleImputationMethods(Enum):
+class ImputationMethods(Enum):
+  # simple methods
   MEAN = 'mean'
   MEDIAN = 'median'
   MOST_FREQUEST = 'most_frequent'
 
-class ImputationByInterpolationMethods(Enum):
-  LINEAR = 'linear'
-  TIME = 'time'
-  QUADRATIC = 'quadratic'
-  CUBIC = 'cubic'
-  SPLINE = 'spline'
-  BARYCENTRIC = 'barycentric'
-  POLYNOMIAL = 'polynomial'
+  # interpolation
+  LINEAR = 'linear-interpolation'
+  TIME = 'time-interpolation'
+  QUADRATIC = 'quadratic-interpolation'
+  CUBIC = 'cubic-interpolation'
+  SPLINE = 'spline-interpolation'
+  BARYCENTRIC = 'barycentric-interpolation'
+  POLYNOMIAL = 'polynomial-interpolation'
