@@ -4,7 +4,6 @@ from models.Response import SimpleImputationResp, ErrorResp
 from models.Request import SimpleImputationReq
 from controllers import imputations
 from my_utils.enums import ImputationStatus, SimpleImputationMethods
-import os
 
 app = Flask(__name__)
 api = FlaskPydanticSpec('imputation-web-service', title='Imputation Web Service')
@@ -40,5 +39,4 @@ def create_imputation_by_interpolation():
   return {}, 200
 
 if __name__ == '__main__':
-  PORT = int(os.environ.get('PORT', 5000))
-  app.run(host='0.0.0.0', port=PORT, debug=False)
+  app.run()
