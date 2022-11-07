@@ -9,7 +9,7 @@ app = Flask(__name__)
 api = FlaskPydanticSpec('imputation-web-service', title='Imputation Web Service')
 api.register(app)
 
-@app.get('/home')
+@app.get('/')
 @api.validate(resp=Response(HTTP_200=None))
 def home():
   return "Hello, World!"
