@@ -32,5 +32,11 @@ def create_simple_imputation():
 
   return res, 200
 
+@app.post('/imputation/interpolation')
+@api.validate()
+def create_imputation_by_interpolation():
+  '''Performs imputation using interpolation. Many interpolation strategies can be used'''
+  return {}, 200
+
 if __name__ == '__main__':
   app.run(debug=True)

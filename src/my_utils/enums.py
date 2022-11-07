@@ -9,4 +9,13 @@ class ImputationStatus(Enum):
 class SimpleImputationMethods(Enum):
   MEAN = 'mean'
   MEDIAN = 'median'
-  MOST_FREQUEST = 'most_frequest'
+  MOST_FREQUEST = 'most_frequent'
+
+class ImputationByInterpolationMethods(Enum):
+  LINEAR = 'linear'
+  TIME = 'time'
+  QUADRATIC = 'quadratic'
+  CUBIC = 'cubic'
+  SPLINE = 'spline'
+  BARYCENTRIC = 'barycentric'
+  POLYNOMIAL = 'polynomial'

@@ -18,3 +18,6 @@ def simple_imputation(time_series: list[float], method: str = 'mean') -> list[fl
   imputed_data = mean_imputer.fit_transform(my_time_series)
 
   return imputed_data.reshape((-1)).tolist() # reshape back to 1d array and parse to a python list
+
+def imputation_by_interpolation(time_series: list[float], method: str = 'linear'):
+  pass
