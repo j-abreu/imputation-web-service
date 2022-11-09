@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 from sklearn.impute import SimpleImputer
 from autoimpute.imputations import SingleImputer
+from my_utils.enums import ImputationStatus
+from . import db
 
 def simple_imputation(data: list[float], method: str = 'mean') -> list[float]:
   '''
@@ -70,25 +72,37 @@ def imputation_by_other_methods(data: list[float], method: str = 'mode'):
   return imputed_data_df[0].tolist()
 
 
-def perform_imputation(data: list[float], method: str) -> list[float]:
+def create_imputation(data: list[float], method: str) -> list[float]:
   if len(data) == 0: 
     return []
   
+  imputed_data = []
+  
   if method in ['mean', 'median', 'most frequent']:
     method = 'most_frequent' if method == 'most frequent' else method
-    return simple_imputation(data, method)
+    imputed_data = simple_imputation(data, method)
 
-  if method in ['linear interpolation', 'time interpolation', 'quadratic interpolation',
+  elif method in ['linear interpolation', 'time interpolation', 'quadratic interpolation',
     'cubic interpolation', 'spline interpolation', 'barycentric interpolation',
     'polynomial interpolation']:
 
     interpolation_strategy = method.replace('interpolation', '').strip()
 
-    return imputation_by_interpolation(data, interpolation_strategy)
+    imputed_data = imputation_by_interpolation(data, interpolation_strategy)
   
-  if method in ['mode', 'random', 'locf', 'nocb', 'normal unit variance']:
-    return imputation_by_other_methods(data, method)
+  elif method in ['mode', 'random', 'locf', 'nocb', 'normal unit variance']:
+    imputed_data = imputation_by_other_methods(data, method)
 
-  return []
+  series_hash = 'abc123'
+
+  new_imputed_series = {
+    'hash': series_hash,
+    'series': imputed_data,
+    'status': ImputationStatus.FINISHED.value
+  }
+
+  db.insert_data('imputed_series', new_imputed_series)
+
+  return imputed_data
 
   
