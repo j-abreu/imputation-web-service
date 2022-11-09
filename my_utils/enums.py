@@ -21,7 +21,7 @@ class ImputationMethods(Enum):
   BARYCENTRIC = 'barycentric interpolation'
   POLYNOMIAL = 'polynomial interpolation'
 
-  #other
+  # other
   MODE = 'mode'
   RANDOM = 'random'
   LOCF = 'locf'
