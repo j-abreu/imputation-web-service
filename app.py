@@ -1,9 +1,11 @@
 from flask import Flask, request, jsonify
 from flask_pydantic_spec import FlaskPydanticSpec, Response, Request
-from models.Response import ImputationResp, ErrorResp
-from models.Request import ImputationReq
-from services import imputation, db
+from database.models import TimeSerie as TimeSerieModel
+from pydantic_models.Response import GetImputationResp, ErrorResp, CreateImputationResp
+from pydantic_models.Request import CreateImputationReq
+from services import imputation
 from my_utils.enums import ImputationStatus, ImputationMethods
+from http import HTTPStatus
 
 app = Flask(__name__)
 api = FlaskPydanticSpec('imputation-web-service', title='Imputation Web Service')
@@ -15,42 +17,41 @@ def home():
   return "Hello, World!"
 
 @app.get('/imputation/<hash>')
-@api.validate(tags=['imputation'], body=None, resp=Response(HTTP_201=ImputationResp, HTTP_400=ErrorResp))
+@api.validate(tags=['imputation'], body=None, resp=Response(HTTP_200=GetImputationResp, HTTP_400=ErrorResp, HTTP_404=None))
 def get_imputation(hash: str):
   """Returns imputed time series based on the given hash"""
   if not hash:
-    return None, 404
+    return '', HTTPStatus.NOT_FOUND.value
   
-  query = db.where('hash') == hash
+  time_serie = TimeSerieModel()
+  result = time_serie.get_by_hash(hash)
 
-  imputed_data = db.find('imputed_series', query)
+  if result == None:
+    return '', HTTPStatus.NOT_FOUND.value
 
-  if imputed_data == None:
-    return None, 404
+  res = GetImputationResp(imputed_data=result['series'], hash=result['hash'], status=result['status']).dict()
 
-  res = ImputationResp(imputed_data=imputed_data['series'], hash=imputed_data['hash'], status=imputed_data['status']).dict()
-
-  return res, 201
+  return res, HTTPStatus.OK.value
 
 
 @app.post('/imputation')
-@api.validate(tags=['imputation'], body=ImputationReq, resp=Response(HTTP_201=ImputationResp, HTTP_400=ErrorResp))
+@api.validate(tags=['imputation'], body=CreateImputationReq, resp=Response(HTTP_201=CreateImputationResp, HTTP_400=ErrorResp))
 def create_imputation():
   """Performs imputation on a univariate time series using many methods"""
-  req = ImputationReq.parse_obj(request.json)
+  req = CreateImputationReq.parse_obj(request.json)
 
   if req.method not in [method.value for method in ImputationMethods]:
     res = ErrorResp(message='Invalid method').dict()
-    return res, 400
+    return res, HTTPStatus.BAD_REQUEST.value
 
-  imputed_data = imputation.create_imputation(req.values, method=req.method)
+  hash = imputation.create_imputation(req.values, method=req.method)
 
-  status = ImputationStatus.CREATED.value
-  hash = '' # TODO: create hash
+  if hash == None:
+    return '', HTTPStatus.BAD_REQUEST.value
 
-  res = ImputationResp(imputed_data=imputed_data, status=status, hash=hash).dict()
+  res = CreateImputationResp(hash=hash).dict()
 
-  return res, 201
+  return res, HTTPStatus.CREATED.value
 
 if __name__ == '__main__':
   app.run()

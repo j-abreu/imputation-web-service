@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.impute import SimpleImputer
 from autoimpute.imputations import SingleImputer
 from my_utils.enums import ImputationStatus
-from . import db
+from database.models import TimeSerie as TimeSerieModel
 
 def simple_imputation(data: list[float], method: str = 'mean') -> list[float]:
   '''
@@ -93,16 +93,17 @@ def create_imputation(data: list[float], method: str) -> list[float]:
   elif method in ['mode', 'random', 'locf', 'nocb', 'normal unit variance']:
     imputed_data = imputation_by_other_methods(data, method)
 
-  series_hash = 'abc123'
+  if (imputed_data) == 0:
+    return None
 
   new_imputed_series = {
-    'hash': series_hash,
     'series': imputed_data,
     'status': ImputationStatus.FINISHED.value
   }
 
-  db.insert_data('imputed_series', new_imputed_series)
+  time_serie = TimeSerieModel()
+  hash = time_serie.insert(new_imputed_series)
 
-  return imputed_data
+  return hash
 
   
