@@ -5,14 +5,14 @@ from autoimpute.imputations import SingleImputer
 
 def simple_imputation(data: list[float], method: str = 'mean') -> list[float]:
   '''
-  Performs simple statistic imputation to a univariate time series.
+  Performs mean, median or most_common imputation to an univariate time series.
 
   Args:
     data (list of float): The time series to be imputed with mean imputation
     method (str): Method to be used in the imputation
   
   Returns:
-    list of float: The resulting time series after mean imputation
+    list of float: The resulting time series after imputation
   '''
 
   data_np = np.array(data, dtype=np.float).reshape((-1, 1)) # reshape to 2d array
@@ -24,14 +24,14 @@ def simple_imputation(data: list[float], method: str = 'mean') -> list[float]:
 
 def imputation_by_interpolation(data: list[float], method: str = 'linear') -> list[float]:
   '''
-    Performs imputation by interpolation to a univariate time series.
+    Performs imputation by interpolation to an univariate time series.
 
     Args:
       data (list of float): The time series to be imputed with mean imputation
       method (str): Method to be used in the imputation by interpolation
     
     Returns:
-      list of float: The resulting time series after mean imputation
+      list of float: The resulting time series after imputation
   '''
   
   data_np = np.array(data, dtype=np.float).reshape((-1, 1)) # reshape to 2d array
@@ -41,26 +41,53 @@ def imputation_by_interpolation(data: list[float], method: str = 'linear') -> li
   single_imputer = SingleImputer(
     strategy='interpolate',
     imp_kwgs={'interpolate': {'fill_strategy': method}}
-)
+  )
 
   imputed_data_df = single_imputer.fit_transform(data_df)
 
   return imputed_data_df[0].tolist()
 
+def imputation_by_other_methods(data: list[float], method: str = 'mode'):
+  '''
+    Performs imputation using Autoimpute SingleImputer and the given method
+
+    Args:
+      data (list of float): The time series to be imputed with mean imputation
+      method (str): Method to be used 
+    
+    Returns:
+      list of float: The resulting time series after imputation
+  '''
+  
+  data_np = np.array(data, dtype=np.float).reshape((-1, 1)) # reshape to 2d array
+
+  data_df = pd.DataFrame(data_np)
+
+  single_imputer = SingleImputer(strategy=method)
+
+  imputed_data_df = single_imputer.fit_transform(data_df)
+
+  return imputed_data_df[0].tolist()
+
+
 def perform_imputation(data: list[float], method: str) -> list[float]:
   if len(data) == 0: 
     return []
   
-  if method in ['mean', 'median', 'most_frequent']:
+  if method in ['mean', 'median', 'most frequent']:
+    method = 'most_frequent' if method == 'most frequent' else method
     return simple_imputation(data, method)
 
-  if method in ['linear-interpolation', 'time-interpolation', 'quadratic-interpolation',
-    'cubic-interpolation', 'spline-interpolation', 'barycentric-interpolation',
-    'polynomial-interpolation']:
+  if method in ['linear interpolation', 'time interpolation', 'quadratic interpolation',
+    'cubic interpolation', 'spline interpolation', 'barycentric interpolation',
+    'polynomial interpolation']:
 
-    interpolation_strategy = method.replace('-interpolation', '')
+    interpolation_strategy = method.replace('interpolation', '').strip()
 
     return imputation_by_interpolation(data, interpolation_strategy)
+  
+  if method in ['mode', 'random', 'locf', 'nocb', 'normal unit variance']:
+    return imputation_by_other_methods(data, method)
 
   return []
 
