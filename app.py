@@ -7,7 +7,10 @@ from services import imputation
 from my_utils.enums import ImputationStatus, ImputationMethods
 from http import HTTPStatus
 
+from time import sleep
 import asyncio
+import threading
+
 
 app = Flask(__name__)
 api = FlaskPydanticSpec('imputation-web-service', title='Imputation Web Service')
@@ -16,7 +19,6 @@ api.register(app)
 @app.get('/home')
 @api.validate(tags=['home'], resp=Response(HTTP_200=None))
 def home():
-  print('hereee')
   return "Hello, World!"
 
 @app.get('/imputation/<hash>')
@@ -32,7 +34,7 @@ def get_imputation(hash: str):
   if result == None:
     return '', HTTPStatus.NOT_FOUND.value
 
-  res = GetImputationResp(imputed_data=result['series'], hash=result['hash'], status=result['status']).dict()
+  res = GetImputationResp(imputed_data=result['series'], hash=result['hash'], status=result['status'], error=result['error']).dict()
 
   return res, HTTPStatus.OK.value
 
@@ -53,22 +55,14 @@ def create_imputation():
 
   job_hash = TimeSerieModel().create_imputation()
 
-  imputation.create_imputation(req.values, req.method, job_hash)
+  threading.Thread(target=lambda: imputation.create_imputation(req.values, req.method, job_hash)).start()
 
   res = CreateImputationResp(hash=job_hash).dict()
-  print('here')
 
   return res, HTTPStatus.CREATED.value
 
-async def background_processor():
-  while True:
-    print('BACKGROUND')
-    await asyncio.sleep(1)
-
 def main():
-  print('RUNNING MAIN')
-  app.run(debug=True, )
-  asyncio.run(background_processor())
+  app.run()
 
 if __name__ == '__main__':
   main()

@@ -2,14 +2,12 @@ import numpy as np
 import pandas as pd
 from sklearn.impute import SimpleImputer
 from autoimpute.imputations import SingleImputer
-from my_utils.enums import ImputationStatus
+from my_utils.enums import ImputationStatus, SimpleImputationMethods, InterpolationImputationMethods, OtherImputationMethods
 from database.models import TimeSerie as TimeSerieModel
 from uuid import uuid4
-import asyncio
+from time import sleep
 
-async def simple_imputation(data: list[float], method: str = 'mean', job_hash: str = '') -> list[float]:
-  print('SIMPLE IMPUTATION')
-
+def simple_imputation(data: list[float], method: str = 'mean', job_hash: str = '') -> list[float]:
   '''
   Performs mean, median or most_common imputation to an univariate time series.
 
@@ -21,13 +19,7 @@ async def simple_imputation(data: list[float], method: str = 'mean', job_hash: s
     list of float: The resulting time series after imputation
   '''
 
-  await asyncio.sleep(30)
-  print('SET STATUS')
-
-
   TimeSerieModel().set_status(job_hash, ImputationStatus.PROCESSING)
-
-  await asyncio.sleep(30)
 
   data_np = np.array(data, dtype=np.float).reshape((-1, 1)) # reshape to 2d array
 
@@ -36,13 +28,11 @@ async def simple_imputation(data: list[float], method: str = 'mean', job_hash: s
 
   imputed_series = imputed_data.reshape((-1)).tolist() # reshape back to 1d array and parse to a python list
 
-  print('FINISH IMPUTATION')
-
   TimeSerieModel().finish_imputation(job_hash, imputed_series)
 
   return
 
-async def imputation_by_interpolation(data: list[float], method: str = 'linear', job_hash: str = '') -> list[float]:
+def imputation_by_interpolation(data: list[float], method: str = 'linear', job_hash: str = '') -> list[float]:
   '''
     Performs imputation by interpolation to an univariate time series.
 
@@ -53,30 +43,36 @@ async def imputation_by_interpolation(data: list[float], method: str = 'linear',
     Returns:
       list of float: The resulting time series after imputation
   '''
-  await asyncio.sleep(30)
 
-  TimeSerieModel().set_status(ImputationStatus.PROCESSING)
+  timeSerieModel = TimeSerieModel()
 
-  await asyncio.sleep(30)
+  timeSerieModel.set_status(job_hash, ImputationStatus.PROCESSING)
+
+  order = None
+  if 'spline' in method or 'polynomial' in method:
+    [order, method] = map(lambda el: el.strip(), method.split('-order'))
+    order = int(order)
   
-  data_np = np.array(data, dtype=np.float).reshape((-1, 1)) # reshape to 2d array
+  try: 
+    data_np = np.array(data, dtype=np.float).reshape((-1, 1)) # reshape to 2d array
 
-  data_df = pd.DataFrame(data_np)
+    data_df = pd.DataFrame(data_np)
 
-  single_imputer = SingleImputer(
-    strategy='interpolate',
-    imp_kwgs={'interpolate': {'fill_strategy': method}}
-  )
+    single_imputer = SingleImputer(
+      strategy='interpolate',
+      imp_kwgs={'interpolate': {'fill_strategy': method, 'order': order}}
+    )
 
-  imputed_data_df = single_imputer.fit_transform(data_df)
+    imputed_data_df = single_imputer.fit_transform(data_df)
 
-  imputed_series = imputed_data_df[0].tolist()
+    imputed_series = imputed_data_df[0].tolist()
 
-  TimeSerieModel().finish_imputation(job_hash, imputed_series)
-
+    timeSerieModel.finish_imputation(job_hash, imputed_series)
+  except Exception as e:
+    timeSerieModel.set_error(job_hash, str(e))
   return
 
-async def imputation_by_other_methods(data: list[float], method: str = 'mode', job_hash: str = ''):
+def imputation_by_other_methods(data: list[float], method: str = 'mode', job_hash: str = ''):
   '''
     Performs imputation using Autoimpute SingleImputer and the given method
 
@@ -87,11 +83,8 @@ async def imputation_by_other_methods(data: list[float], method: str = 'mode', j
     Returns:
       list of float: The resulting time series after imputation
   '''
-  await asyncio.sleep(30)
 
-  TimeSerieModel().set_status(ImputationStatus.PROCESSING)
-
-  await asyncio.sleep(30)
+  TimeSerieModel().set_status(job_hash, ImputationStatus.PROCESSING)
   
   data_np = np.array(data, dtype=np.float).reshape((-1, 1)) # reshape to 2d array
 
@@ -108,22 +101,26 @@ async def imputation_by_other_methods(data: list[float], method: str = 'mode', j
   return
 
 def create_imputation(data: list[float], method: str, job_hash: str) -> str:
-  print('CREATE IMPUTATION')
-  return
-  if method in ['mean', 'median', 'most frequent']:
+
+  simple_methods = [member.value for member in SimpleImputationMethods]
+  interpolation_methods = [member.value for member in InterpolationImputationMethods]
+  other_methods = [member.value for member in OtherImputationMethods]
+
+  if method in simple_methods:
     method = 'most_frequent' if method == 'most frequent' else method
+
     simple_imputation(data, method, job_hash)
 
-  elif method in ['linear interpolation', 'time interpolation', 'quadratic interpolation',
-    'cubic interpolation', 'spline interpolation', 'barycentric interpolation',
-    'polynomial interpolation']:
-
+  elif method in interpolation_methods:
     interpolation_strategy = method.replace('interpolation', '').strip()
 
     imputation_by_interpolation(data, interpolation_strategy, job_hash)
   
-  elif method in ['mode', 'random', 'locf', 'nocb', 'normal unit variance']:
+  elif method in other_methods:
     imputation_by_other_methods(data, method, job_hash)
+  
+  else:
+    TimeSerieModel().set_error(job_hash, 'no method found')
 
   return
 

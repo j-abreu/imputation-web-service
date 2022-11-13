@@ -20,14 +20,11 @@ class ImputationStatus(Enum):
   ERROR = 'error'
 
 class SimpleImputationMethods(Enum):
-  # simple methods
   MEAN = 'mean'
   MEDIAN = 'median'
   MOST_FREQUEST = 'most frequent'
 
 class InterpolationImputationMethods(Enum):
-
-  # interpolation
   LINEAR = 'linear interpolation'
   TIME = 'time interpolation'
   QUADRATIC = 'quadratic interpolation'
