@@ -7,6 +7,8 @@ from services import imputation
 from my_utils.enums import ImputationStatus, ImputationMethods
 from http import HTTPStatus
 
+import asyncio
+
 app = Flask(__name__)
 api = FlaskPydanticSpec('imputation-web-service', title='Imputation Web Service')
 api.register(app)
@@ -44,14 +46,28 @@ def create_imputation():
     res = ErrorResp(message='Invalid method').dict()
     return res, HTTPStatus.BAD_REQUEST.value
 
-  hash = imputation.create_imputation(req.values, method=req.method)
+  if len(req.values) == 0: 
+    res = ErrorResp(message='Empty time series').dict()
+    return res, HTTPStatus.BAD_REQUEST.value
 
-  if hash == None:
-    return '', HTTPStatus.BAD_REQUEST.value
+  job_hash = TimeSerieModel().create_imputation()
 
-  res = CreateImputationResp(hash=hash).dict()
+  imputation.create_imputation(req.values, req.method, job_hash)
+
+  res = CreateImputationResp(hash=job_hash).dict()
+  print('here')
 
   return res, HTTPStatus.CREATED.value
 
+async def background_processor():
+  while True:
+    print('BACKGROUND')
+    await asyncio.sleep(1)
+
+def main():
+  print('RUNNING MAIN')
+  app.run(debug=True, )
+  asyncio.run(background_processor())
+
 if __name__ == '__main__':
-  app.run()
+  main()
