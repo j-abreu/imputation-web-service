@@ -25,7 +25,8 @@ class TimeSerie:
     data = {
       'series': [],
       'hash': hash,
-      'status': ImputationStatus.CREATED.value
+      'status': ImputationStatus.CREATED.value,
+      'error': None
     }
 
     self.table.insert(data)
@@ -33,15 +34,8 @@ class TimeSerie:
     return hash
 
   def set_status(self, hash: str, status: ImputationStatus) -> None:
-    result = self.table.find(where('hash') == hash)
 
-    if len(result) == 0:
-      return
-    
-    imputation = result[0]
-    imputation['status'] = status.value
-
-    self.table.update(imputation, where('hash') == hash)
+    self.table.update({'status': status.value}, where('hash') == hash)
 
     return
 
@@ -49,9 +43,13 @@ class TimeSerie:
 
     data = {
       'series': series,
+      'status': ImputationStatus.FINISHED.value
     }
 
     self.table.update(data, where('hash') == hash)
+  
+  def set_error(self, hash: str, error_message: str) -> None:
+    self.table.update({'status': ImputationStatus.ERROR.value, 'error': {"message": error_message}}, where('hash') == hash)
 
   def get_by_hash(self, hash: str):
     result = self.table.search(where('hash') == hash)
