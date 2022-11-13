@@ -16,6 +16,7 @@ api.register(app)
 @app.get('/home')
 @api.validate(tags=['home'], resp=Response(HTTP_200=None))
 def home():
+  print('hereee')
   return "Hello, World!"
 
 @app.get('/imputation/<hash>')
