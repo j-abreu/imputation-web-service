@@ -7,7 +7,9 @@ class GetImputationResp(BaseModel):
   status: str
   hash: str
   imputed_data: list[float | None]
+  imputed_indexes: list[int]
   error: None | ImputationError
+  only_imputed_data: bool
 
 class CreateImputationResp(BaseModel):
   hash: str

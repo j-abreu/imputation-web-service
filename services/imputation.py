@@ -7,6 +7,11 @@ from database.models import TimeSerie as TimeSerieModel
 from uuid import uuid4
 from time import sleep
 
+def get_null_values_indexes(data: list[float]) -> list[int]:
+  data_df = pd.DataFrame(data)
+  
+  return data_df[data_df[0].isnull()].index.tolist()
+
 def simple_imputation(data: list[float], method: str = 'mean', job_hash: str = '') -> list[float]:
   '''
   Performs mean, median or most_common imputation to an univariate time series.
@@ -60,7 +65,7 @@ def imputation_by_interpolation(data: list[float], method: str = 'linear', job_h
 
     single_imputer = SingleImputer(
       strategy='interpolate',
-      imp_kwgs={'interpolate': {'fill_strategy': method, 'order': order}}
+      imp_kwgs={'interpolate': {'fill_strategy': method, 'order': 7}}
     )
 
     imputed_data_df = single_imputer.fit_transform(data_df)
@@ -101,6 +106,15 @@ def imputation_by_other_methods(data: list[float], method: str = 'mode', job_has
   return
 
 def create_imputation(data: list[float], method: str, job_hash: str) -> str:
+
+  time_series = TimeSerieModel()
+
+  time_series.update_where_hash(job_hash, {
+    'status': ImputationStatus.PROCESSING.value,
+    'imputed_indexes': get_null_values_indexes(data)
+  })
+
+  sleep(15)
 
   simple_methods = [member.value for member in SimpleImputationMethods]
   interpolation_methods = [member.value for member in InterpolationImputationMethods]
