@@ -27,14 +27,27 @@ def get_imputation(hash: str):
   """Returns imputed time series based on the given hash"""
   if not hash:
     return '', HTTPStatus.NOT_FOUND.value
+
+  onlyImputedData = request.args.get('onlyImputed')
+
+  if onlyImputedData == None:
+    onlyImputedData = False
+  else:
+    onlyImputedData = True if onlyImputedData.lower() == 'true' else False
   
   time_serie = TimeSerieModel()
-  result = time_serie.get_by_hash(hash)
+  result = time_serie.get_by_hash(hash, onlyImputedData)
 
   if result == None:
     return '', HTTPStatus.NOT_FOUND.value
 
-  res = GetImputationResp(imputed_data=result['series'], hash=result['hash'], status=result['status'], error=result['error']).dict()
+  res = GetImputationResp(
+    imputed_data=result['series'],
+    hash=result['hash'],
+    status=result['status'],
+    error=result['error'],
+    imputed_indexes=result['imputed_indexes'],
+    only_imputed_data=onlyImputedData).dict()
 
   return res, HTTPStatus.OK.value
 
