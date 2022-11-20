@@ -47,6 +47,8 @@ def get_imputation(hash: str):
     status=result['status'],
     error=result['error'],
     imputed_indexes=result['imputed_indexes'],
+    method=result['method'],
+    order=result['order'],
     only_imputed_data=onlyImputedData).dict()
 
   return res, HTTPStatus.OK.value
@@ -81,12 +83,13 @@ def create_imputation():
     res = ErrorResp(message='Empty time series').dict()
     return res, HTTPStatus.BAD_REQUEST.value
 
-  job_hash = TimeSerieModel().create_imputation()
-
   method = {
     'name': req.method,
     'order': method_order
   }
+
+  job_hash = TimeSerieModel().create_imputation(method['name'], method['order'])
+
   threading.Thread(target=lambda: imputation.create_imputation(req.values, method, job_hash)).start()
 
   res = CreateImputationResp(hash=job_hash).dict()

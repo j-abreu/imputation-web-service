@@ -21,14 +21,16 @@ class TimeSerie:
 
     return hash
   
-  def create_imputation(self) -> str:
+  def create_imputation(self, method: str, order: int = None) -> str:
     hash = str(uuid4())
     data = {
       'series': [],
       'imputed_indexes': [],
       'hash': hash,
       'status': ImputationStatus.CREATED.value,
-      'error': None
+      'error': None,
+      'method': method,
+      'order': order
     }
 
     self.table.insert(data)
