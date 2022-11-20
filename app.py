@@ -62,13 +62,32 @@ def create_imputation():
     res = ErrorResp(message='Invalid method').dict()
     return res, HTTPStatus.BAD_REQUEST.value
 
+  method_with_order = [ImputationMethods.SPLINE.value, ImputationMethods.POLYNOMIAL.value]
+  allowed_orders = [1, 2, 3, 4, 5] # TODO: verify allowed orders
+  method_order = None
+
+  if req.method in method_with_order:
+    if req.order is None:
+      res = ErrorResp(message='This method requires an order argument').dict()
+      return res, HTTPStatus.BAD_REQUEST.value
+    
+    if req.order in allowed_orders:
+      method_order = req.order
+    else:
+      res = ErrorResp(message=f'Order must in {allowed_orders}').dict()
+      return res, HTTPStatus.BAD_REQUEST.value
+
   if len(req.values) == 0: 
     res = ErrorResp(message='Empty time series').dict()
     return res, HTTPStatus.BAD_REQUEST.value
 
   job_hash = TimeSerieModel().create_imputation()
 
-  threading.Thread(target=lambda: imputation.create_imputation(req.values, req.method, job_hash)).start()
+  method = {
+    'name': req.method,
+    'order': method_order
+  }
+  threading.Thread(target=lambda: imputation.create_imputation(req.values, method, job_hash)).start()
 
   res = CreateImputationResp(hash=job_hash).dict()
 

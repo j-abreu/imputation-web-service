@@ -27,15 +27,9 @@ class SimpleImputationMethods(Enum):
 class InterpolationImputationMethods(Enum):
   LINEAR = 'linear interpolation'
   TIME = 'time interpolation'
-  QUADRATIC = 'quadratic interpolation'
-  CUBIC = 'cubic interpolation'
-  SPLINE_1_ORDER = '1-order spline interpolation'
-  SPLINE_2_ORDER = '2-order spline interpolation'
-  SPLINE_3_ORDER = '3-order spline interpolation'
+  SPLINE = 'spline interpolation'
   BARYCENTRIC = 'barycentric interpolation'
-  POLYNOMIAL_2_ORDER = '1-order polynomial interpolation'
-  POLYNOMIAL_3_ORDER = '2-order polynomial interpolation'
-  POLYNOMIAL_4_ORDER = '3-order polynomial interpolation'
+  POLYNOMIAL = 'polynomial interpolation'
 
 class OtherImputationMethods(Enum):
   MODE = 'mode'
