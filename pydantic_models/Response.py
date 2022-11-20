@@ -10,6 +10,8 @@ class GetImputationResp(BaseModel):
   imputed_indexes: list[int]
   error: None | ImputationError
   only_imputed_data: bool
+  method: str
+  order: str | None
 
 class CreateImputationResp(BaseModel):
   hash: str
