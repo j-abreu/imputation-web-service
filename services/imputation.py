@@ -37,13 +37,15 @@ def simple_imputation(data: list[float], method: str = 'mean', job_hash: str = '
 
   return
 
-def imputation_by_interpolation(data: list[float], method: str = 'linear', job_hash: str = '') -> list[float]:
+def imputation_by_interpolation(data: list[float], method: str = 'linear', order: int = None, job_hash: str = '') -> list[float]:
   '''
     Performs imputation by interpolation to an univariate time series.
 
     Args:
       data (list of float): The time series to be imputed with mean imputation
       method (str): Method to be used in the imputation by interpolation
+      order: Order for polynomial or spline method
+      job_hash: Unique identifier for the job
     
     Returns:
       list of float: The resulting time series after imputation
@@ -52,11 +54,6 @@ def imputation_by_interpolation(data: list[float], method: str = 'linear', job_h
   timeSerieModel = TimeSerieModel()
 
   timeSerieModel.set_status(job_hash, ImputationStatus.PROCESSING)
-
-  order = None
-  if 'spline' in method or 'polynomial' in method:
-    [order, method] = map(lambda el: el.strip(), method.split('-order'))
-    order = int(order)
   
   try: 
     data_np = np.array(data, dtype=np.float).reshape((-1, 1)) # reshape to 2d array
@@ -65,7 +62,7 @@ def imputation_by_interpolation(data: list[float], method: str = 'linear', job_h
 
     single_imputer = SingleImputer(
       strategy='interpolate',
-      imp_kwgs={'interpolate': {'fill_strategy': method, 'order': 7}}
+      imp_kwgs={'interpolate': {'fill_strategy': method, 'order': order}}
     )
 
     imputed_data_df = single_imputer.fit_transform(data_df)
@@ -83,7 +80,8 @@ def imputation_by_other_methods(data: list[float], method: str = 'mode', job_has
 
     Args:
       data (list of float): The time series to be imputed with mean imputation
-      method (str): Method to be used 
+      method (str): Method to be used
+      job_hash: Unique identifier for the job
     
     Returns:
       list of float: The resulting time series after imputation
@@ -105,7 +103,12 @@ def imputation_by_other_methods(data: list[float], method: str = 'mode', job_has
 
   return
 
-def create_imputation(data: list[float], method: str, job_hash: str) -> str:
+def create_imputation(data: list[float], method: dict[str, str], job_hash: str) -> str:
+
+  method_name = method['name']
+  method_order = method['order']
+
+  print(method_name, method_order)
 
   time_series = TimeSerieModel()
 
@@ -114,24 +117,22 @@ def create_imputation(data: list[float], method: str, job_hash: str) -> str:
     'imputed_indexes': get_null_values_indexes(data)
   })
 
-  sleep(15)
-
   simple_methods = [member.value for member in SimpleImputationMethods]
   interpolation_methods = [member.value for member in InterpolationImputationMethods]
   other_methods = [member.value for member in OtherImputationMethods]
 
-  if method in simple_methods:
-    method = 'most_frequent' if method == 'most frequent' else method
+  if method_name in simple_methods:
+    method_name = 'most_frequent' if method_name == 'most frequent' else method_name
 
-    simple_imputation(data, method, job_hash)
+    simple_imputation(data, method_name, job_hash)
 
-  elif method in interpolation_methods:
-    interpolation_strategy = method.replace('interpolation', '').strip()
+  elif method_name in interpolation_methods:
+    interpolation_strategy = method_name.replace('interpolation', '').strip()
 
-    imputation_by_interpolation(data, interpolation_strategy, job_hash)
+    imputation_by_interpolation(data, interpolation_strategy, method_order, job_hash)
   
-  elif method in other_methods:
-    imputation_by_other_methods(data, method, job_hash)
+  elif method_name in other_methods:
+    imputation_by_other_methods(data, method_name, job_hash)
   
   else:
     TimeSerieModel().set_error(job_hash, 'no method found')
