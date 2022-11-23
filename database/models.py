@@ -1,88 +1,123 @@
-from tinydb import TinyDB, Query, where
 import numpy as np
+from . import db
 from my_utils.enums import ImputationStatus
 from uuid import uuid4
-
-db = TinyDB('database/db.json')
-
+from pymongo import ReturnDocument
+from bson.objectid import ObjectId
 
 class TimeSerie:
   # TODO: implement update and update_where_hash
   def __init__(self):
-    self.table = db.table('series')
+    self.collection = db.get_collection('time_series')
   
-  def get(self, id: int):
-    result = self.table.get(doc_id=id)
+  def add_str_id(self, document):
+    document['id'] = str(document['_id'])
+    return document
+
+  def insert_one(self, data: dict):
+    result = self.collection.insert_one(data)
+
+    return str(result.inserted_id)
     
-    return result
+  def get(self, id: int, only_imputed_data: bool = False):
+    document = self.collection.find_one({'_id': ObjectId(id)})
 
-  def insert(self, data: dict):
-    self.table.insert(data)
+    if document is None or only_imputed_data is False:
+      return self.add_str_id(document)
 
-    return hash
+    imputed_data = np.array(document['series'])
+    imputed_indexes = document['imputed_indexes']
+    document['series'] = list(imputed_data[imputed_indexes])
+
+    return self.add_str_id(document)
+  
+  def find(self, where: dict) -> dict:
+    result = self.collection.find(where)
+    return self.add_str_id(result)
+  
+  def find_one(self, where: dict) -> dict:
+    result = self.collection.find_one(where)
+
+    return self.add_str_id(result)
+
+  def update(self, data: dict, where: dict):
+    result = self.collection.find_one_and_update(
+      where,
+      {"$set": data},
+      return_document=ReturnDocument.AFTER
+    )
+
+    return self.add_str_id(result)
+  
+  def update_by_id(self, id: str, data: dict) -> dict:
+    result = self.collection.find_one_and_update(
+      {"_id": ObjectId(id)},
+      {
+        "$set": data
+      },
+      return_document=ReturnDocument.AFTER
+    )
+
+    print(f'[UPDATING]: {result}')
+
+    return self.add_str_id(result)
   
   def create_imputation(self, method: str, order: int = None) -> str:
-    hash = str(uuid4())
     data = {
       'series': [],
       'imputed_indexes': [],
-      'hash': hash,
       'status': ImputationStatus.CREATED.value,
       'error': None,
       'method': method,
       'order': order
     }
 
-    self.table.insert(data)
+    result = self.collection.insert_one(data)
 
-    return hash
+    return str(result.inserted_id)
 
-  def set_status(self, hash: str, status: ImputationStatus) -> None:
+  def set_status(self, id: str, status: ImputationStatus) -> dict:
+    result = self.collection.find_one_and_update(
+      {"_id": ObjectId(id)},
+      {
+        "$set": {
+          "status": status.value
+        }
+      },
+      return_document=ReturnDocument.AFTER
 
-    self.table.update({'status': status.value}, where('hash') == hash)
+    )
 
-    return
+    return self.add_str_id(result)
 
-  def finish_imputation(self, hash: str, series: list[float]) -> None:
+  def finish_imputation(self, id: str, series: list[float]) -> dict:
 
     data = {
       'series': series,
       'status': ImputationStatus.FINISHED.value
     }
 
-    self.table.update(data, where('hash') == hash)
+    result = self.collection.find_one_and_update(
+      {"_id": ObjectId(id)},
+      {"$set": data},
+      return_document=ReturnDocument.AFTER
+
+    )
+
+    return self.add_str_id(result)
   
-  def set_error(self, hash: str, error_message: str) -> None:
-    self.table.update({'status': ImputationStatus.ERROR.value, 'error': {"message": error_message}}, where('hash') == hash)
+  def set_error(self, id: str, error_message: str) -> dict:
+    new_data = {
+      'status': ImputationStatus.ERROR.value,
+      'error': {"message": error_message}
+    }
 
-  def get_by_hash(self, hash: str, onlyImputed: bool = False):
-    result = self.table.search(where('hash') == hash)
-
-    if len(result) == 0:
-      return None
+    result = self.collection.find_one_and_update(
+      {"_id": ObjectId(id)},
+      {"$set": new_data},
+      return_document=ReturnDocument.AFTER
+    )
     
-    if not onlyImputed:
-      return result[0]
-
-    document = result[0]
-    imputed_data = np.array(document['series'])
-    imputed_indexes = document['imputed_indexes']
-
-    document['series'] = list(imputed_data[imputed_indexes])
-
-    return document
-
-  def find(self, query):
-    result = self.table.search(query)
-
-    if len(result) == 0:
-      return None
-
-    return result[0]
-
-  def update_where_hash(self, hash: str, data: dict):
-    self.table.update(data, where('hash') == hash)
-
-    return
+    return self.add_str_id(result)
 
 

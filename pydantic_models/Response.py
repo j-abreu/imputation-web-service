@@ -5,7 +5,7 @@ class ImputationError(BaseModel):
 
 class GetImputationResp(BaseModel):
   status: str
-  hash: str
+  id: str
   imputed_data: list[float | None]
   imputed_indexes: list[int]
   error: None | ImputationError
@@ -14,7 +14,7 @@ class GetImputationResp(BaseModel):
   order: str | None
 
 class CreateImputationResp(BaseModel):
-  hash: str
+  id: str
 
 class ErrorResp(BaseModel):
   message: str
