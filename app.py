@@ -7,10 +7,7 @@ from services import imputation
 from my_utils.enums import ImputationStatus, ImputationMethods
 from http import HTTPStatus
 
-from time import sleep
-import asyncio
 import threading
-
 
 app = Flask(__name__)
 api = FlaskPydanticSpec('imputation-web-service', title='Imputation Web Service')
@@ -21,11 +18,11 @@ api.register(app)
 def home():
   return "Hello, World!"
 
-@app.get('/imputation/<hash>')
+@app.get('/imputation/<id>')
 @api.validate(tags=['imputation'], body=None, resp=Response(HTTP_200=GetImputationResp, HTTP_400=ErrorResp, HTTP_404=None))
-def get_imputation(hash: str):
-  """Returns imputed time series based on the given hash"""
-  if not hash:
+def get_imputation(id: str):
+  """Returns imputed time series based on the given id"""
+  if not id:
     return '', HTTPStatus.NOT_FOUND.value
 
   onlyImputedData = request.args.get('onlyImputed')
@@ -36,14 +33,14 @@ def get_imputation(hash: str):
     onlyImputedData = True if onlyImputedData.lower() == 'true' else False
   
   time_serie = TimeSerieModel()
-  result = time_serie.get_by_hash(hash, onlyImputedData)
+  result = time_serie.get(id, onlyImputedData)
 
   if result == None:
     return '', HTTPStatus.NOT_FOUND.value
 
   res = GetImputationResp(
     imputed_data=result['series'],
-    hash=result['hash'],
+    id=result['id'],
     status=result['status'],
     error=result['error'],
     imputed_indexes=result['imputed_indexes'],
@@ -88,11 +85,11 @@ def create_imputation():
     'order': method_order
   }
 
-  job_hash = TimeSerieModel().create_imputation(method['name'], method['order'])
+  job_id = TimeSerieModel().create_imputation(method['name'], method['order'])
 
-  threading.Thread(target=lambda: imputation.create_imputation(req.values, method, job_hash)).start()
+  threading.Thread(target=lambda: imputation.create_imputation(req.values, method, job_id)).start()
 
-  res = CreateImputationResp(hash=job_hash).dict()
+  res = CreateImputationResp(id=job_id).dict()
 
   return res, HTTPStatus.CREATED.value
 
