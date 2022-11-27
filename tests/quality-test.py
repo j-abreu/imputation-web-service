@@ -5,15 +5,16 @@ import pandas as pd
 path_root = Path(__file__).parents[1]
 sys.path.append(str(path_root))
 from my_utils.enums import ImputationMethods as im
+from services import imputation as IMP
 
 DATA_PATH = './data/daily-temperature.csv'
 COLUMN_NAME = 'temp'
 
-def load_data(path: str, column: str):
+def load_data(path: str, column: str) -> pd.DataFrame:
   data = pd.read_csv(Path(path))
   return data[column]
 
-def main():
+def main() -> None:
   imputation_methods = [
     {
       'name': im.MEAN.value,
@@ -69,10 +70,11 @@ def main():
     },
   ]
 
-  data = load_data(DATA_PATH)
+  data = load_data(DATA_PATH, 'temp')
+  results = pd.DataFrame()
 
   for method in imputation_methods:
-    pass
+    pass 
 
 if __name__ == '__main__':
   main()

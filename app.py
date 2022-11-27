@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_pydantic_spec import FlaskPydanticSpec, Response, Request
-from database.models import TimeSerie as TimeSerieModel
+from database.models import TimeSerie as TimeSerie
 from pydantic_models.Response import GetImputationResp, ErrorResp, CreateImputationResp
 from pydantic_models.Request import CreateImputationReq
 from services import imputation
@@ -32,8 +32,8 @@ def get_imputation(id: str):
   else:
     onlyImputedData = True if onlyImputedData.lower() == 'true' else False
   
-  time_serie = TimeSerieModel()
-  result = time_serie.get(id, onlyImputedData)
+  TimeSerieModel = TimeSerie()
+  result = TimeSerieModel.get(id, onlyImputedData)
 
   if result == None:
     return '', HTTPStatus.NOT_FOUND.value
@@ -85,7 +85,8 @@ def create_imputation():
     'order': method_order
   }
 
-  job_id = TimeSerieModel().create_imputation(method['name'], method['order'])
+  TimeSerieModel = TimeSerie()
+  job_id = TimeSerieModel.create_imputation(method['name'], method['order'])
 
   threading.Thread(target=lambda: imputation.create_imputation(req.values, method, job_id)).start()
 
