@@ -104,7 +104,7 @@ def imputation_by_other_methods(data: list[float], method: str = 'mode') -> list
   return imputed_series
 
 
-def route_imputation(data: list[float], method_name: str, method_order: int) -> str:
+def route_imputation(data: list[float], method_name: str, method_order: int) -> list[float]:
   simple_methods = [member.value for member in SimpleImputationMethods]
   interpolation_methods = [member.value for member in InterpolationImputationMethods]
   other_methods = [member.value for member in OtherImputationMethods]
@@ -123,6 +123,9 @@ def route_imputation(data: list[float], method_name: str, method_order: int) -> 
   
   elif method_name in other_methods:
     imputation_results = imputation_by_other_methods(data, method_name)
+
+  if isinstance(imputation_results, str):
+    print(f'[ERROR]: {imputation_results}')
   
   return imputation_results
 

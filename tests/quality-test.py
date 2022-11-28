@@ -1,21 +1,22 @@
-from pathlib import Path
-import sys
 import pandas as pd
+import numpy as np
+import sys
+import time
+from datetime import datetime
+from pathlib import Path
 
 path_root = Path(__file__).parents[1]
 sys.path.append(str(path_root))
 from my_utils.enums import ImputationMethods as im
-from services import imputation as IMP
+from services import imputation as imp
 
-DATA_PATH = './data/daily-temperature.csv'
-COLUMN_NAME = 'temp'
 
-def load_data(path: str, column: str) -> pd.DataFrame:
-  data = pd.read_csv(Path(path))
-  return data[column]
-
-def main() -> None:
-  imputation_methods = [
+CWD = Path(__file__).parents[0]
+FILE_PATH = './data/daily-temperature.csv'
+COLUMN_COMPLETE = 'temp'
+COLUMN_MISS = 'temp_miss'
+# TODO: Verify time interpolation method error
+METHODS = [
     {
       'name': im.MEAN.value,
       'order': None,
@@ -32,13 +33,13 @@ def main() -> None:
       'name': im.LINEAR.value,
       'order': None,
     },
-    {
-      'name': im.TIME.value,
-      'order': None,
-    },
+    # {
+    #   'name': im.TIME.value,
+    #   'order': None,
+    # },
     {
       'name': im.SPLINE.value,
-      'order': None,
+      'order': 3,
     },
     {
       'name': im.BARYCENTRIC.value,
@@ -70,11 +71,48 @@ def main() -> None:
     },
   ]
 
-  data = load_data(DATA_PATH, 'temp')
-  results = pd.DataFrame()
+def load_data(path: str, column: str) -> list[float]:
+  path = Path(CWD, path)
+  data = pd.read_csv(path)
 
-  for method in imputation_methods:
-    pass 
+  return data[column].tolist()
+
+def save_results(results: pd.DataFrame):
+  file_name = f'results_{str(datetime.now())}.csv'.replace(':', '-')
+  path = Path(Path(__file__).parents[0], 'results', file_name)
+  results.to_csv(path, index=False)
+
+
+def replace_nan_with_none(x: list[float]):
+  x_np = np.array(x)
+  x_result = np.where(np.isnan(x_np), None, x_np).tolist()
+  return x_result
+
+def rmse(predictions: list[float], targets: list[float]) -> float:
+  predictions_np, targets_np = np.array(predictions), np.array(targets)
+
+  return np.sqrt(((predictions_np - targets_np) ** 2).mean())
+
+
+def main() -> None:
+  data_miss, data_complete = load_data(FILE_PATH, COLUMN_MISS), load_data(FILE_PATH, COLUMN_COMPLETE)
+  results = []
+
+  for method in METHODS:
+    print(f"[START] -> method: {method['name']} - order: {method['order']}")
+    start_ms = time.time() * 1000
+    imputation_results = imp.route_imputation(data_miss, method['name'], method['order'])
+    end_ms = time.time() * 1000
+
+    time_diff_ms = end_ms - start_ms
+    result_rmse = rmse(imputation_results, data_complete)
+
+    results.append([method['name'], method['order'], result_rmse, time_diff_ms])
+    print(f"[FINISH] -> method: {method['name']} - time: {time_diff_ms}")
+  
+  columns = ['method_name', 'method_order', 'rmse', 'exec_time_ms']
+  results_df = pd.DataFrame(results, columns=columns)
+  save_results(results_df)
 
 if __name__ == '__main__':
   main()
