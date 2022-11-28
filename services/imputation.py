@@ -2,8 +2,8 @@ import numpy as np
 import pandas as pd
 from sklearn.impute import SimpleImputer
 from autoimpute.imputations import SingleImputer
-from my_utils.enums import ImputationStatus, SimpleImputationMethods, InterpolationImputationMethods, OtherImputationMethods
-from database.models import TimeSerie as TimeSerieModel
+from my_utils.enums import ImputationStatus, ImputationMethods, SimpleImputationMethods, InterpolationImputationMethods, OtherImputationMethods
+from database.models import TimeSerie as TimeSerie
 from uuid import uuid4
 from time import sleep
 
@@ -12,7 +12,7 @@ def get_null_values_indexes(data: list[float]) -> list[int]:
   
   return data_df[data_df[0].isnull()].index.tolist()
 
-def simple_imputation(data: list[float], method: str = 'mean', job_id: str = '') -> list[float]:
+def simple_imputation(data: list[float], method: str = 'mean') -> list[float]:
   '''
   Performs mean, median or most_common imputation to an univariate time series.
 
@@ -24,20 +24,22 @@ def simple_imputation(data: list[float], method: str = 'mean', job_id: str = '')
     list of float: The resulting time series after imputation
   '''
 
-  TimeSerieModel().set_status(job_id, ImputationStatus.PROCESSING)
+  imputed_data = None
+  
+  try:
+    data_np = np.array(data, dtype=np.float).reshape((-1, 1)) # reshape to 2d array
 
-  data_np = np.array(data, dtype=np.float).reshape((-1, 1)) # reshape to 2d array
+    simple_imputer = SimpleImputer(missing_values=np.nan, strategy=method)
+    imputed_data = simple_imputer.fit_transform(data_np)
 
-  simple_imputer = SimpleImputer(missing_values=np.nan, strategy=method)
-  imputed_data = simple_imputer.fit_transform(data_np)
+    imputed_series = imputed_data.reshape((-1)).tolist() # reshape back to 1d array and parse to a python list
 
-  imputed_series = imputed_data.reshape((-1)).tolist() # reshape back to 1d array and parse to a python list
+  except Exception as e:
+    return str(e)
 
-  TimeSerieModel().finish_imputation(job_id, imputed_series)
+  return imputed_series
 
-  return
-
-def imputation_by_interpolation(data: list[float], method: str = 'linear', order: int = None, job_id: str = '') -> list[float]:
+def imputation_by_interpolation(data: list[float], method: str = 'linear', order: int = None) -> list[float] | str:
   '''
     Performs imputation by interpolation to an univariate time series.
 
@@ -45,16 +47,13 @@ def imputation_by_interpolation(data: list[float], method: str = 'linear', order
       data (list of float): The time series to be imputed with mean imputation
       method (str): Method to be used in the imputation by interpolation
       order: Order for polynomial or spline method
-      job_id: Unique identifier for the job
     
     Returns:
       list of float: The resulting time series after imputation
   '''
 
-  timeSerieModel = TimeSerieModel()
+  imputed_series = None
 
-  timeSerieModel.set_status(job_id, ImputationStatus.PROCESSING)
-  
   try: 
     data_np = np.array(data, dtype=np.float).reshape((-1, 1)) # reshape to 2d array
 
@@ -69,73 +68,91 @@ def imputation_by_interpolation(data: list[float], method: str = 'linear', order
 
     imputed_series = imputed_data_df[0].tolist()
 
-    timeSerieModel.finish_imputation(job_id, imputed_series)
   except Exception as e:
-    timeSerieModel.set_error(job_id, str(e))
-  return
+    return str(e)
+  
+  return imputed_series
 
-def imputation_by_other_methods(data: list[float], method: str = 'mode', job_id: str = ''):
+
+def imputation_by_other_methods(data: list[float], method: str = 'mode') -> list[float]:
   '''
     Performs imputation using Autoimpute SingleImputer and the given method
 
     Args:
       data (list of float): The time series to be imputed with mean imputation
       method (str): Method to be used
-      job_id: Unique identifier for the job
     
     Returns:
       list of float: The resulting time series after imputation
   '''
 
-  TimeSerieModel().set_status(job_id, ImputationStatus.PROCESSING)
-  
-  data_np = np.array(data, dtype=np.float).reshape((-1, 1)) # reshape to 2d array
+  imputed_series = None
 
-  data_df = pd.DataFrame(data_np)
+  try:
+    data_np = np.array(data, dtype=np.float).reshape((-1, 1)) # reshape to 2d array
 
-  single_imputer = SingleImputer(strategy=method)
+    data_df = pd.DataFrame(data_np)
 
-  imputed_data_df = single_imputer.fit_transform(data_df)
+    single_imputer = SingleImputer(strategy=method)
 
-  imputed_series = imputed_data_df[0].tolist()
+    imputed_data_df = single_imputer.fit_transform(data_df)
 
-  TimeSerieModel().finish_imputation(job_id, imputed_series)
+    imputed_series = imputed_data_df[0].tolist()
+  except Exception as e:
+    return str(e)
 
-  return
+  return imputed_series
 
-def create_imputation(data: list[float], method: dict[str, str], job_id: str) -> str:
 
-  method_name = method['name']
-  method_order = method['order']
-
-  print(method_name, method_order)
-
-  time_series = TimeSerieModel()
-
-  time_series.update_by_id(job_id, {
-    'status': ImputationStatus.PROCESSING.value,
-    'imputed_indexes': get_null_values_indexes(data)
-  })
-
+def route_imputation(data: list[float], method_name: str, method_order: int) -> list[float]:
   simple_methods = [member.value for member in SimpleImputationMethods]
   interpolation_methods = [member.value for member in InterpolationImputationMethods]
   other_methods = [member.value for member in OtherImputationMethods]
 
+  imputation_results = []
+
   if method_name in simple_methods:
     method_name = 'most_frequent' if method_name == 'most frequent' else method_name
 
-    simple_imputation(data, method_name, job_id)
+    imputation_results = simple_imputation(data, method_name)
 
   elif method_name in interpolation_methods:
     interpolation_strategy = method_name.replace('interpolation', '').strip()
 
-    imputation_by_interpolation(data, interpolation_strategy, method_order, job_id)
+    imputation_results = imputation_by_interpolation(data, interpolation_strategy, method_order)
   
   elif method_name in other_methods:
-    imputation_by_other_methods(data, method_name, job_id)
+    imputation_results = imputation_by_other_methods(data, method_name)
+
+  if isinstance(imputation_results, str):
+    print(f'[ERROR]: {imputation_results}')
   
-  else:
-    TimeSerieModel().set_error(job_id, 'no method found')
+  return imputation_results
+
+def create_imputation(data: list[float], method: dict[str, str], job_id: str) -> str:
+  method_name = method['name']
+  method_order = method['order']
+
+  TimeSerieModel = TimeSerie()
+
+  if method_name not in [member.value for member in ImputationMethods]:
+    TimeSerieModel.set_error(job_id, 'no method found')
+    return
+
+  print(f'[CREATING]: {method_name} - {method_order}')
+
+  TimeSerieModel.update_by_id(job_id, {
+    'status': ImputationStatus.PROCESSING.value,
+    'imputed_indexes': get_null_values_indexes(data)
+  })
+
+  imputation_results = route_imputation(data, method_name, method_order)
+
+  if isinstance(imputation_results, str):
+    TimeSerieModel.set_error(job_id, imputation_results)
+    return
+
+  TimeSerieModel.finish_imputation(job_id, imputation_results)
 
   return
 

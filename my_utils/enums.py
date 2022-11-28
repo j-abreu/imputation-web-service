@@ -22,7 +22,7 @@ class ImputationStatus(Enum):
 class SimpleImputationMethods(Enum):
   MEAN = 'mean'
   MEDIAN = 'median'
-  MOST_FREQUEST = 'most frequent'
+  MOST_FREQUENT = 'most frequent'
 
 class InterpolationImputationMethods(Enum):
   LINEAR = 'linear interpolation'

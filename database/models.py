@@ -5,8 +5,10 @@ from uuid import uuid4
 from pymongo import ReturnDocument
 from bson.objectid import ObjectId
 
+DB_NAME = 'imputation_dev'
+COLLECTION_NAME = 'time_series'
+
 class TimeSerie:
-  # TODO: implement update and update_where_hash
   def __init__(self):
     self.collection = db.get_collection('time_series')
   
@@ -57,8 +59,6 @@ class TimeSerie:
       },
       return_document=ReturnDocument.AFTER
     )
-
-    print(f'[UPDATING]: {result}')
 
     return self.add_str_id(result)
   
