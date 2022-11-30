@@ -1,6 +1,6 @@
 from enum import Enum
 
-def get_composite_enum(name: str, enums: list[Enum], additional_keys_value = {}) -> Enum:
+def get_composite_enum(name: str, enums: list[Enum], additional_keys_value: dict = {}) -> Enum:
   new_composite_enum = {}
   for enum in enums:
     keys = list(enum.__members__)
