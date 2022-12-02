@@ -15,6 +15,7 @@ CWD = Path(__file__).parents[0]
 FILE_PATH = './data/daily-temperature.csv'
 COLUMN_COMPLETE = 'temp'
 COLUMN_MISS = 'temp_miss'
+NUM_RUNS = 30
 # TODO: Verify time interpolation method error
 METHODS = [
     {
@@ -93,24 +94,44 @@ def rmse(predictions: list[float], targets: list[float]) -> float:
 
   return np.sqrt(((predictions_np - targets_np) ** 2).mean())
 
+def mae(predictions: list[float], targets: list[float]) -> float:
+  predictions_np, targets_np = np.array(predictions), np.array(targets)
+
+  return np.mean(np.abs(targets_np - predictions_np))
 
 def main() -> None:
   data_miss, data_complete = load_data(FILE_PATH, COLUMN_MISS), load_data(FILE_PATH, COLUMN_COMPLETE)
+
   results = []
-
   for method in METHODS:
+    partial_results = {
+      'time': [],
+      'mae': [],
+    }
+
     print(f"[START] -> method: {method['name']} - order: {method['order']}")
-    start_ms = time.time() * 1000
-    imputation_results = imp.route_imputation(data_miss, method['name'], method['order'])
-    end_ms = time.time() * 1000
+    print('[', end='')
+    for i in range(NUM_RUNS):
+      print('-', end='')
+      start_ms = time.time() * 1000
+      imputation_results = imp.route_imputation(data_miss, method['name'], method['order'])
+      end_ms = time.time() * 1000
 
-    time_diff_ms = end_ms - start_ms
-    result_rmse = rmse(imputation_results, data_complete)
+      time_diff_ms = end_ms - start_ms
+      partial_results['time'].append(time_diff_ms)
+      partial_results['mae'].append(mae(imputation_results, data_complete))
+    print(']')
 
-    results.append([method['name'], method['order'], result_rmse, time_diff_ms])
+    mean_mae = np.mean(partial_results['mae'])
+    mean_time = np.mean(partial_results['time'])
+    std_time = np.std(partial_results['time'])
+
+    results.append([method['name'], method['order'], mean_mae, mean_time, std_time])
     print(f"[FINISH] -> method: {method['name']} - time: {time_diff_ms}")
+    if i == 2:
+      break
   
-  columns = ['method_name', 'method_order', 'rmse', 'exec_time_ms']
+  columns = ['method_name', 'method_order', 'mae', 'mean_exec_time_ms', 'std_time']
   results_df = pd.DataFrame(results, columns=columns)
   save_results(results_df)
 
