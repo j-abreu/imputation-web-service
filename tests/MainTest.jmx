@@ -146,7 +146,7 @@
             <connectTime>true</connectTime>
           </value>
         </objProp>
-        <stringProp name="filename">.\tests\results\tree-results</stringProp>
+        <stringProp name="filename">./tests/results/results-tree.csv</stringProp>
       </ResultCollector>
       <hashTree/>
       <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table" enabled="true">
@@ -183,7 +183,7 @@
             <connectTime>true</connectTime>
           </value>
         </objProp>
-        <stringProp name="filename">.\tests\results\table-results</stringProp>
+        <stringProp name="filename">./tests/results/results-table.csv</stringProp>
       </ResultCollector>
       <hashTree/>
       <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report" enabled="true">
@@ -220,7 +220,7 @@
             <connectTime>true</connectTime>
           </value>
         </objProp>
-        <stringProp name="filename">.\tests\results\aggregate-results</stringProp>
+        <stringProp name="filename">./tests/results/aggregate-report.csv</stringProp>
       </ResultCollector>
       <hashTree/>
     </hashTree>
