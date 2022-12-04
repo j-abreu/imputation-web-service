@@ -35,6 +35,12 @@
               <stringProp name="Argument.metadata">=</stringProp>
               <stringProp name="Argument.desc">aws machine server ip</stringProp>
             </elementProp>
+            <elementProp name="results_output" elementType="Argument">
+              <stringProp name="Argument.name">results_output</stringProp>
+              <stringProp name="Argument.value">./results/linear-interpolation</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+              <stringProp name="Argument.desc">dir to store result files</stringProp>
+            </elementProp>
           </collectionProp>
           <stringProp name="TestPlan.comments">Environment variables</stringProp>
         </Arguments>
@@ -159,7 +165,7 @@
             <connectTime>true</connectTime>
           </value>
         </objProp>
-        <stringProp name="filename">./tests/results/results-tree.csv</stringProp>
+        <stringProp name="filename">${results_output}/results-tree.csv</stringProp>
       </ResultCollector>
       <hashTree/>
       <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table" enabled="true">
@@ -196,7 +202,7 @@
             <connectTime>true</connectTime>
           </value>
         </objProp>
-        <stringProp name="filename">./tests/results/results-table.csv</stringProp>
+        <stringProp name="filename">${results_output}/results-table.csv</stringProp>
       </ResultCollector>
       <hashTree/>
       <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report" enabled="true">
@@ -233,7 +239,7 @@
             <connectTime>true</connectTime>
           </value>
         </objProp>
-        <stringProp name="filename">./tests/results/aggregate-report.csv</stringProp>
+        <stringProp name="filename">${results_output}/aggregate-report.csv</stringProp>
       </ResultCollector>
       <hashTree/>
     </hashTree>
