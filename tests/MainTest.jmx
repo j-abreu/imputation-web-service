@@ -210,7 +210,7 @@
         <objProp>
           <name>saveConfig</name>
           <value class="SampleSaveConfiguration">
-            <time>true</time>
+            <time>false</time>
             <latency>true</latency>
             <timestamp>false</timestamp>
             <success>true</success>
