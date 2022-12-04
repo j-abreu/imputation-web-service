@@ -18,14 +18,27 @@
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">1</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">30000</stringProp>
+        <stringProp name="ThreadGroup.num_threads">3000</stringProp>
         <stringProp name="ThreadGroup.ramp_time">30</stringProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
         <stringProp name="ThreadGroup.duration"></stringProp>
         <stringProp name="ThreadGroup.delay"></stringProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <stringProp name="TestPlan.comments">aws machine ip: 172.31.10.42</stringProp>
       </ThreadGroup>
       <hashTree>
+        <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+          <collectionProp name="Arguments.arguments">
+            <elementProp name="server_ip" elementType="Argument">
+              <stringProp name="Argument.name">server_ip</stringProp>
+              <stringProp name="Argument.value">172.31.10.42</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+              <stringProp name="Argument.desc">aws machine server ip</stringProp>
+            </elementProp>
+          </collectionProp>
+          <stringProp name="TestPlan.comments">Environment variables</stringProp>
+        </Arguments>
+        <hashTree/>
         <BeanShellSampler guiclass="BeanShellSamplerGui" testclass="BeanShellSampler" testname="Reset Status" enabled="true">
           <stringProp name="BeanShellSampler.query">vars.put(&quot;status&quot;, &quot;&quot;)</stringProp>
           <stringProp name="BeanShellSampler.filename"></stringProp>
@@ -47,7 +60,7 @@
               </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="HTTPSampler.domain">172.31.10.42</stringProp>
+          <stringProp name="HTTPSampler.domain">${server_ip}</stringProp>
           <stringProp name="HTTPSampler.port">5000</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding">utf8</stringProp>
@@ -87,7 +100,7 @@
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
               <collectionProp name="Arguments.arguments"/>
             </elementProp>
-            <stringProp name="HTTPSampler.domain">172.31.10.42</stringProp>
+            <stringProp name="HTTPSampler.domain">${server_ip}</stringProp>
             <stringProp name="HTTPSampler.port">5000</stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
