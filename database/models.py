@@ -26,6 +26,10 @@ class TimeSerie:
 
     if document is None or only_imputed_data is False:
       return self.add_str_id(document)
+    
+    if document['status'] == ImputationStatus.ERROR.value:
+      document['imputed_indexes'] = []
+      return self.add_str_id(document)
 
     imputed_data = np.array(document['series'])
     imputed_indexes = document['imputed_indexes']
@@ -119,5 +123,4 @@ class TimeSerie:
     )
     
     return self.add_str_id(result)
-
 
