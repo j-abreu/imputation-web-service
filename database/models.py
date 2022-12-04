@@ -27,7 +27,7 @@ class TimeSerie:
     if document is None or only_imputed_data is False:
       return self.add_str_id(document)
     
-    if document['status'] == ImputationStatus.ERROR.value:
+    if document['status'] != ImputationStatus.FINISHED.value:
       document['imputed_indexes'] = []
       return self.add_str_id(document)
 
@@ -123,4 +123,3 @@ class TimeSerie:
     )
     
     return self.add_str_id(result)
-
