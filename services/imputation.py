@@ -139,8 +139,6 @@ def create_imputation(data: list[float], method: dict[str, str], job_id: str) ->
     TimeSerieModel.set_error(job_id, 'no method found')
     return
 
-  print(f'[CREATING]: {method_name} - {method_order}')
-
   TimeSerieModel.update_by_id(job_id, {
     'status': ImputationStatus.PROCESSING.value,
     'imputed_indexes': get_null_values_indexes(data)
