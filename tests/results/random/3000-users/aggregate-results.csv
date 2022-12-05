@@ -1,0 +1,5 @@
+Label,# Samples,Average,Median,90% Line,95% Line,99% Line,Min,Max,Error %,Throughput,Received KB/sec,Std. Dev.
+Reset Status,3000,0,0,1,1,7,0,80,0.00%,96.9,.0,2.94
+Create Imputation,3000,16021,4617,55628,64860,66119,8,69423,2.40%,34.9,8.8,20026.44
+Get Imputation,2957,7695,1545,31846,35112,65542,9,66351,0.81%,34.5,19.5,14959.52
+TOTAL,8957,7906,1235,32641,54379,65695,0,69423,1.07%,103.5,28.0,15849.72
