@@ -1,1 +1,93 @@
-<mxfile host="app.diagrams.net" modified="2022-12-07T01:06:02.330Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.56" etag="PEBqeXKgDpQDS6gvJNl8" version="20.6.0" type="gitlab"><diagram name="Page-1" id="52a04d89-c75d-2922-d76d-85b35f80e030">7Vxtb+MoEP41+djIgF/ij5dsu7dSV7vaSnefSUwSro6JbNI0++sPYrBj43Sdd9dxW6lhwBjPM8MzMMQ9NFq8f43xcv6dBSTsQSt476EvPQiBbQ3EPynZpBLPVoJZTAPVKBe80N9ECS0lXdGAJIWGnLGQ02VROGFRRCa8IMNxzNbFZlMWFu+6xDNiCF4mODSl/9KAz5UUWFZe8Tehs7m69cBRFWM8eZ3FbBWp+0UsImnNAutuVNNkjgO23hGhxx4axYzx9NPifURCqVatsfS6pz212ZBjEvE6F0BAsO/60HVwYAF38IDUwN5wuFJ6+II5HuNEPULCN1pBc74IxSfQQ8Pt0xLZqSVK2VPJwoQt6ER9DvGYhMNMPSMWslhUbRUkLuMxe810LXQxnLKIP+EFDaUJ/UPiAEdYiZW9ANkMh3QWicJEPDWJ0wEsZe3ifSZts09Z4q1of87iZxpJmxqailK6eyMxJ+87IqW4r4QtCI83oomq9bWhbrTdeml5vWMtyEll8x1D0XaClYHOsq5zpMQHBdYepD3bE0NAxCUD37aDB7vD7UjcoOXcEDfoG8D9WPHlihuwreeUk5clnsjyWuhHqOOyUIIToDwDUB4sAuVU+JducnacpsEUjaEzdqzJ1AbkAXoGICQQfKGKSn87ePxJ0TjmT1TeP8VLlpVCB6JMokDVgrS0U1cTkr0IJGwVT8gee9QEIMYzI3yPMlRHUgEfAhmTEHP6ViTUs7pPBV99izrvETVuyXkqJrnrOc+gnc6zxy8KvrNvwr+B8xiw+PcLS7mN1xhU0MfOwmI+ZzMW4fAxl7YTpL2rk/OhtL30rzjGm50GS0Yjnuz0/FMK8qnVsUuRP4IlxNMec/yzoR1nEnryz0kO9B3DSpI1XYS47LNbdFSjLZ3NaRg84w1bSS0L+CevujQUgTb9LdpjffGudUBX9iZsQ1tUDyJiyd/ClS+yR3WvmCTi2p/aEkAmesYJz+g1DPEyoePtCGWThTABGg0Z52yhrVQ92lPx9tPtTxWB5nwOrs7np3O3jUrkbZvkbVeRN7wESxjG90voElrAMEDxdLxofKkGS2rdtSGtaRGY0Wj2TKbySexc8ks9nBRVhXBMKHUabrGd0yAg0RZ7Lpe+mcUrdxZDdIbiT+htZAn3ccSQR6IM8rL4k81jPmKRGDqmWwSJMNY1kQZbK1Db57x/Rl8vSN16aOt2Z0Xb/nid01b2cWuECPDsy56j2Mf3BoXJwXbdy7KPa0wA3dZSva0lNLBMV77Y1pIRSJohQivDe6+G7yL7Ir5rhoae1bcsEawKv/SgrbesdKDo+X0fWRAhBKDneX6x+/QJVI8l4E/0YXQnS706tqB5swFrPa8isHe7wP5uAntw08h+0EX2J0X2Xm34GxHZWwasraQAvwYFNGe3z0z/gT7sGKC1DJCF+hkDoBsyADDTZx0FHEIBfm38m0AByIT1HjZ3QJ283GUWiIdu7gzKh1OQVUL83KmFqtyCuVjsCKgtBOSVk1e3JaAuu3BiduGTpRfQfSxCAKqxCgHNOQqix1ugAROrjgbaQgPldQiqOgV7PRowjy93NHAQDaDaBtAIGjA3ue9iIeLUYIWzZyeOWoi4pfnBti69EHEqGMg8CtcxUFsYyBmUGeiWuRBgnnLoGOggBnJqG0AjGMjcZG/nQqRWRtxpzkKkKiVu+mBHA62hgVKcYVccmboeC3Qp8RNZ4JPlxO07YYE6SfHzn289Hpd7+cJYHVxAc04r6PEW2Nn0oY6d28LOzaJn2B1XOJGeP9d5BftOTrBn77f5JMeWs3lklwbMLw51NNAWGiifW74xDcCOBk6igQMMoBE0cJ/H1mCdbNHZjxAclS3KXiWSf9GphPiZs0XQzBb9GP8nXwNXtpR7f/ELqnot2fXe/GKmVTqcShzaCKDQxxn51oTa+ougH++4NCcfglr63rHjcGnODiUyTyyZQIUhXSZkT5xYObldf3FwIRLSXz7XAYFrHi9DFXMbOnxuE8X8halpbJG/kBY9/g8=</diagram></mxfile>
+<mxfile host="app.diagrams.net" modified="2022-12-07T01:27:27.013Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.56" etag="emup2Iy5RTyFgSYIL7Tx" version="20.6.0" type="gitlab">
+  <diagram name="Page-1" id="52a04d89-c75d-2922-d76d-85b35f80e030">
+    <mxGraphModel dx="1980" dy="1176" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="none" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="W06Trd2OWitXyWGzXINa-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Courier New;" edge="1" parent="1" source="W06Trd2OWitXyWGzXINa-2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="170" y="200" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="W06Trd2OWitXyWGzXINa-2" value="Início" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#d5e8d4;strokeColor=#82b366;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="50" y="170" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="W06Trd2OWitXyWGzXINa-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;fontFamily=Courier New;" edge="1" parent="1" source="W06Trd2OWitXyWGzXINa-3">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="490" y="200" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="W06Trd2OWitXyWGzXINa-6" value="Sim" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontFamily=Courier New;" vertex="1" connectable="0" parent="W06Trd2OWitXyWGzXINa-5">
+          <mxGeometry x="-0.1833" y="1" relative="1" as="geometry">
+            <mxPoint y="-9" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="W06Trd2OWitXyWGzXINa-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontFamily=Courier New;" edge="1" parent="1" source="W06Trd2OWitXyWGzXINa-3" target="W06Trd2OWitXyWGzXINa-11">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="740" y="70.00000000000011" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="W06Trd2OWitXyWGzXINa-9" value="Não" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;fontFamily=Courier New;" vertex="1" connectable="0" parent="W06Trd2OWitXyWGzXINa-8">
+          <mxGeometry x="-0.1743" y="2" relative="1" as="geometry">
+            <mxPoint x="-48" y="52" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="W06Trd2OWitXyWGzXINa-3" value="Estrutura e restrições corretos" style="rhombus;whiteSpace=wrap;html=1;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="310" y="160" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="W06Trd2OWitXyWGzXINa-10" value="Fim" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#f8cecc;strokeColor=#b85450;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="170" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="W06Trd2OWitXyWGzXINa-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontFamily=Courier New;" edge="1" parent="1" source="W06Trd2OWitXyWGzXINa-11" target="W06Trd2OWitXyWGzXINa-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="W06Trd2OWitXyWGzXINa-11" value="Retorna&lt;br&gt;400 BAD REQUEST" style="whiteSpace=wrap;html=1;aspect=fixed;labelBackgroundColor=none;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="620" y="30" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="W06Trd2OWitXyWGzXINa-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Courier New;" edge="1" parent="1" source="W06Trd2OWitXyWGzXINa-13" target="W06Trd2OWitXyWGzXINa-16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="W06Trd2OWitXyWGzXINa-19" value="{Id}" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontFamily=Courier New;fontStyle=1" vertex="1" connectable="0" parent="W06Trd2OWitXyWGzXINa-17">
+          <mxGeometry x="-0.1722" relative="1" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="W06Trd2OWitXyWGzXINa-13" value="Retorna 201 CREATED" style="whiteSpace=wrap;html=1;aspect=fixed;labelBackgroundColor=none;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="490" y="160" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="W06Trd2OWitXyWGzXINa-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Courier New;" edge="1" parent="1" source="W06Trd2OWitXyWGzXINa-16">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="850" y="200" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="W06Trd2OWitXyWGzXINa-23" value="{Id}" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontFamily=Courier New;fontStyle=1" vertex="1" connectable="0" parent="W06Trd2OWitXyWGzXINa-22">
+          <mxGeometry x="-0.3284" relative="1" as="geometry">
+            <mxPoint x="3" y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="W06Trd2OWitXyWGzXINa-16" value="GET /imputation/&amp;lt;id&amp;gt;" style="whiteSpace=wrap;html=1;aspect=fixed;labelBackgroundColor=none;fontFamily=Courier New;fontSize=8;" vertex="1" parent="1">
+          <mxGeometry x="690" y="160" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="W06Trd2OWitXyWGzXINa-20" value="{time_series,&lt;br&gt;method,&lt;br&gt;order}" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontFamily=Courier New;fontStyle=1;labelBackgroundColor=none;" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="660.0042857142857" y="180" as="geometry">
+            <mxPoint x="-374" y="-11" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="W06Trd2OWitXyWGzXINa-26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Courier New;" edge="1" parent="1" source="W06Trd2OWitXyWGzXINa-24">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="960" y="280" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="W06Trd2OWitXyWGzXINa-24" value="Status da imputação" style="rhombus;whiteSpace=wrap;html=1;labelBackgroundColor=none;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="850" y="160" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="W06Trd2OWitXyWGzXINa-28" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontFamily=Courier New;fontSize=8;" edge="1" parent="1" source="W06Trd2OWitXyWGzXINa-27" target="W06Trd2OWitXyWGzXINa-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="W06Trd2OWitXyWGzXINa-27" value="POST /imputation" style="whiteSpace=wrap;html=1;aspect=fixed;labelBackgroundColor=none;fontFamily=Courier New;fontSize=8;" vertex="1" parent="1">
+          <mxGeometry x="170" y="165" width="70" height="70" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
