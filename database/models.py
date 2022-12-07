@@ -22,20 +22,23 @@ class TimeSerie:
     return str(result.inserted_id)
     
   def get(self, id: int, only_imputed_data: bool = False):
-    document = self.collection.find_one({'_id': ObjectId(id)})
+    try:
+      document = self.collection.find_one({'_id': ObjectId(id)})
 
-    if document is None or only_imputed_data is False:
+      if document is None or only_imputed_data is False:
+        return self.add_str_id(document)
+      
+      if document['status'] != ImputationStatus.FINISHED.value:
+        document['imputed_indexes'] = []
+        return self.add_str_id(document)
+
+      imputed_data = np.array(document['series'])
+      imputed_indexes = document['imputed_indexes']
+      document['series'] = list(imputed_data[imputed_indexes])
+
       return self.add_str_id(document)
-    
-    if document['status'] != ImputationStatus.FINISHED.value:
-      document['imputed_indexes'] = []
-      return self.add_str_id(document)
-
-    imputed_data = np.array(document['series'])
-    imputed_indexes = document['imputed_indexes']
-    document['series'] = list(imputed_data[imputed_indexes])
-
-    return self.add_str_id(document)
+    except Exception as e:
+      return None
   
   def find(self, where: dict) -> dict:
     result = self.collection.find(where)
