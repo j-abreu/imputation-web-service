@@ -6,11 +6,11 @@ from pymongo import ReturnDocument
 from bson.objectid import ObjectId
 
 DB_NAME = 'imputation_dev'
-COLLECTION_NAME = 'time_series'
+COLLECTION_NAME = 'imputation'
 
-class TimeSerie:
+class ImputationModel:
   def __init__(self):
-    self.collection = db.get_collection('time_series')
+    self.collection = db.get_collection(COLLECTION_NAME)
   
   def add_str_id(self, document):
     document['id'] = str(document['_id'])
@@ -32,9 +32,9 @@ class TimeSerie:
         document['imputed_indexes'] = []
         return self.add_str_id(document)
 
-      imputed_data = np.array(document['series'])
+      imputed_data = np.array(document['imputed_time_series'])
       imputed_indexes = document['imputed_indexes']
-      document['series'] = list(imputed_data[imputed_indexes])
+      document['imputed_time_series'] = list(imputed_data[imputed_indexes])
 
       return self.add_str_id(document)
     except Exception as e:
@@ -69,9 +69,10 @@ class TimeSerie:
 
     return self.add_str_id(result)
   
-  def create_imputation(self, method: str, order: int = None) -> str:
+  def create_imputation(self, time_series: list[float], method: str, order: int = None) -> str:
     data = {
-      'series': [],
+      'time_series': time_series,
+      'imputed_time_series': [],
       'imputed_indexes': [],
       'status': ImputationStatus.CREATED.value,
       'error': None,
@@ -100,7 +101,7 @@ class TimeSerie:
   def finish_imputation(self, id: str, series: list[float]) -> dict:
 
     data = {
-      'series': series,
+      'imputed_time_series': series,
       'status': ImputationStatus.FINISHED.value
     }
 

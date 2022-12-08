@@ -114,7 +114,7 @@ def main() -> None:
     for i in range(NUM_RUNS):
       print('-', end='')
       start_ms = time.time() * 1000
-      imputation_results = imp.route_imputation(data_miss, method['name'], method['order'])
+      imputation_results = imp.route(data_miss, method['name'], method['order'])
       end_ms = time.time() * 1000
 
       time_diff_ms = end_ms - start_ms

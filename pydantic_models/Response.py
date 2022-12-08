@@ -6,7 +6,7 @@ class ImputationError(BaseModel):
 class GetImputationResp(BaseModel):
   status: str
   id: str
-  imputed_data: list[float | None]
+  imputed_time_series: list[float | None]
   imputed_indexes: list[int]
   error: None | ImputationError
   only_imputed_data: bool

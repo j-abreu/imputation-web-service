@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.impute import SimpleImputer
 from autoimpute.imputations import SingleImputer
 from my_utils.enums import ImputationStatus, ImputationMethods, SimpleImputationMethods, InterpolationImputationMethods, OtherImputationMethods
-from database.models import TimeSerie as TimeSerie
+from database.models import ImputationModel
 from uuid import uuid4
 from time import sleep
 
@@ -104,7 +104,7 @@ def imputation_by_other_methods(data: list[float], method: str = 'mode') -> list
   return imputed_series
 
 
-def route_imputation(data: list[float], method_name: str, method_order: int) -> list[float]:
+def route(data: list[float], method_name: str, method_order: int) -> list[float]:
   simple_methods = [member.value for member in SimpleImputationMethods]
   interpolation_methods = [member.value for member in InterpolationImputationMethods]
   other_methods = [member.value for member in OtherImputationMethods]
@@ -129,29 +129,44 @@ def route_imputation(data: list[float], method_name: str, method_order: int) -> 
   
   return imputation_results
 
-def create_imputation(data: list[float], method: dict[str, str], job_id: str) -> str:
-  method_name = method['name']
-  method_order = method['order']
+def process(job_id: str) -> None:
+  imputationModel = ImputationModel()
 
-  TimeSerieModel = TimeSerie()
+  imputation = imputationModel.get(job_id)
+
+
+  method_name = imputation['method']
+  method_order = imputation['order']
 
   if method_name not in [member.value for member in ImputationMethods]:
-    TimeSerieModel.set_error(job_id, 'no method found')
+    imputationModel.set_error(job_id, 'no method found')
     return
 
-  TimeSerieModel.update_by_id(job_id, {
+  imputationModel.update_by_id(job_id, {
     'status': ImputationStatus.PROCESSING.value,
-    'imputed_indexes': get_null_values_indexes(data)
+    'imputed_indexes': get_null_values_indexes(imputation['time_series'])
   })
 
-  imputation_results = route_imputation(data, method_name, method_order)
+  imputation_results = route(imputation['time_series'], method_name, method_order)
 
   if isinstance(imputation_results, str):
-    TimeSerieModel.set_error(job_id, imputation_results)
+    imputationModel.set_error(job_id, imputation_results)
     return
 
-  TimeSerieModel.finish_imputation(job_id, imputation_results)
+  imputationModel.finish_imputation(job_id, imputation_results)
 
   return
 
-  
+def create(time_series: list[float], method: str, order: int | None) -> str:
+
+  imputationModel = ImputationModel()
+
+  id = imputationModel.create_imputation(time_series, method, order)
+
+  return id
+
+def get(id: str, onlyImputedData: bool = False):
+  imputationModel = ImputationModel()
+  result = imputationModel.get(id, onlyImputedData)
+
+  return result

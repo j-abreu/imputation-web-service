@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify
 from flask_pydantic_spec import FlaskPydanticSpec, Response, Request
-from database.models import TimeSerie as TimeSerie
 from pydantic_models.Response import GetImputationResp, ErrorResp, CreateImputationResp
 from pydantic_models.Request import CreateImputationReq
 from services import imputation
@@ -32,14 +31,13 @@ def get_imputation(id: str):
   else:
     onlyImputedData = True if onlyImputedData.lower() == 'true' else False
   
-  TimeSerieModel = TimeSerie()
-  result = TimeSerieModel.get(id, onlyImputedData)
+  result = imputation.get(id, onlyImputedData)
 
   if result == None:
     return '', HTTPStatus.NOT_FOUND.value
 
   res = GetImputationResp(
-    imputed_data=result['series'],
+    imputed_time_series=result['imputed_time_series'],
     id=result['id'],
     status=result['status'],
     error=result['error'],
@@ -76,7 +74,7 @@ def create_imputation():
       res = ErrorResp(message=f'Order must in {allowed_orders}').dict()
       return res, HTTPStatus.BAD_REQUEST.value
 
-  if len(req.values) == 0: 
+  if len(req.time_series) == 0: 
     res = ErrorResp(message='Empty time series').dict()
     return res, HTTPStatus.BAD_REQUEST.value
 
@@ -85,10 +83,9 @@ def create_imputation():
     'order': method_order
   }
 
-  TimeSerieModel = TimeSerie()
-  job_id = TimeSerieModel.create_imputation(method['name'], method['order'])
+  job_id = imputation.create(req.time_series, method['name'], method['order'])
 
-  threading.Thread(target=lambda: imputation.create_imputation(req.values, method, job_id)).start()
+  threading.Thread(target=lambda: imputation.process(job_id)).start()
 
   res = CreateImputationResp(id=job_id).dict()
 

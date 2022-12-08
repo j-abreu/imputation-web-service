@@ -1,6 +1,6 @@
 from pydantic import BaseModel, PrivateAttr, Field, constr
 
 class CreateImputationReq(BaseModel):
-  values: list[float | None]
+  time_series: list[float | None]
   method: str = 'mean'
   order: int | None
