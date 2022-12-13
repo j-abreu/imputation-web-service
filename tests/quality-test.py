@@ -2,8 +2,10 @@ import pandas as pd
 import numpy as np
 import sys
 import time
+import math
 from datetime import datetime
 from pathlib import Path
+from matplotlib import pyplot as plt
 
 path_root = Path(__file__).parents[1]
 sys.path.append(str(path_root))
@@ -15,21 +17,21 @@ CWD = Path(__file__).parents[0]
 FILE_PATH = './data/daily-temperature.csv'
 COLUMN_COMPLETE = 'temp'
 COLUMN_MISS = 'temp_miss'
-NUM_RUNS = 30
+NUM_RUNS = 1
 # TODO: Verify time interpolation method error
 METHODS = [
-    {
-      'name': im.MEAN.value,
-      'order': None,
-    },
-    {
-      'name': im.MEDIAN.value,
-      'order': None,
-    },
-    {
-      'name': im.MOST_FREQUENT.value,
-      'order': None,
-    },
+    # {
+    #   'name': im.MEAN.value,
+    #   'order': None,
+    # },
+    # {
+    #   'name': im.MEDIAN.value,
+    #   'order': None,
+    # },
+    # {
+    #   'name': im.MOST_FREQUENT.value,
+    #   'order': None,
+    # },
     {
       'name': im.LINEAR.value,
       'order': None,
@@ -38,38 +40,38 @@ METHODS = [
     #   'name': im.TIME.value,
     #   'order': None,
     # },
-    {
-      'name': im.SPLINE.value,
-      'order': 3,
-    },
-    {
-      'name': im.BARYCENTRIC.value,
-      'order': None,
-    },
-    {
-      'name': im.POLYNOMIAL.value,
-      'order': 3,
-    },
-    {
-      'name': im.MODE.value,
-      'order': None,
-    },
-    {
-      'name': im.RANDOM.value,
-      'order': None,
-    },
-    {
-      'name': im.LOCF.value,
-      'order': None,
-    },
-    {
-      'name': im.NOCB.value,
-      'order': None,
-    },
-    {
-      'name': im.NORMAL_UNIT_VARIANCE.value,
-      'order': None,
-    },
+    # {
+    #   'name': im.SPLINE.value,
+    #   'order': 3,
+    # },
+    # {
+    #   'name': im.BARYCENTRIC.value,
+    #   'order': None,
+    # },
+    # {
+    #   'name': im.POLYNOMIAL.value,
+    #   'order': 3,
+    # },
+    # {
+    #   'name': im.MODE.value,
+    #   'order': None,
+    # },
+    # {
+    #   'name': im.RANDOM.value,
+    #   'order': None,
+    # },
+    # {
+    #   'name': im.LOCF.value,
+    #   'order': None,
+    # },
+    # {
+    #   'name': im.NOCB.value,
+    #   'order': None,
+    # },
+    # {
+    #   'name': im.NORMAL_UNIT_VARIANCE.value,
+    #   'order': None,
+    # },
   ]
 
 def load_data(path: str, column: str) -> list[float]:
@@ -116,6 +118,13 @@ def main() -> None:
       start_ms = time.time() * 1000
       imputation_results = imp.route(data_miss, method['name'], method['order'])
       end_ms = time.time() * 1000
+
+      plt.plot(imputation_results)
+      plt.plot(data_complete)
+      plt.ylim(25, 30)
+      plt.show()
+
+      print('MAE:', mae(imputation_results, data_complete))
 
       time_diff_ms = end_ms - start_ms
       partial_results['time'].append(time_diff_ms)
