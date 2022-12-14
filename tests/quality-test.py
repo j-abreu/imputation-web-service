@@ -17,21 +17,21 @@ CWD = Path(__file__).parents[0]
 FILE_PATH = './data/daily-temperature.csv'
 COLUMN_COMPLETE = 'temp'
 COLUMN_MISS = 'temp_miss'
-NUM_RUNS = 1
+NUM_RUNS = 30
 # TODO: Verify time interpolation method error
 METHODS = [
-    # {
-    #   'name': im.MEAN.value,
-    #   'order': None,
-    # },
-    # {
-    #   'name': im.MEDIAN.value,
-    #   'order': None,
-    # },
-    # {
-    #   'name': im.MOST_FREQUENT.value,
-    #   'order': None,
-    # },
+    {
+      'name': im.MEAN.value,
+      'order': None,
+    },
+    {
+      'name': im.MEDIAN.value,
+      'order': None,
+    },
+    {
+      'name': im.MOST_FREQUENT.value,
+      'order': None,
+    },
     {
       'name': im.LINEAR.value,
       'order': None,
@@ -40,38 +40,38 @@ METHODS = [
     #   'name': im.TIME.value,
     #   'order': None,
     # },
-    # {
-    #   'name': im.SPLINE.value,
-    #   'order': 3,
-    # },
-    # {
-    #   'name': im.BARYCENTRIC.value,
-    #   'order': None,
-    # },
-    # {
-    #   'name': im.POLYNOMIAL.value,
-    #   'order': 3,
-    # },
-    # {
-    #   'name': im.MODE.value,
-    #   'order': None,
-    # },
-    # {
-    #   'name': im.RANDOM.value,
-    #   'order': None,
-    # },
-    # {
-    #   'name': im.LOCF.value,
-    #   'order': None,
-    # },
-    # {
-    #   'name': im.NOCB.value,
-    #   'order': None,
-    # },
-    # {
-    #   'name': im.NORMAL_UNIT_VARIANCE.value,
-    #   'order': None,
-    # },
+    {
+      'name': im.SPLINE.value,
+      'order': 3,
+    },
+    {
+      'name': im.BARYCENTRIC.value,
+      'order': None,
+    },
+    {
+      'name': im.POLYNOMIAL.value,
+      'order': 3,
+    },
+    {
+      'name': im.MODE.value,
+      'order': None,
+    },
+    {
+      'name': im.RANDOM.value,
+      'order': None,
+    },
+    {
+      'name': im.LOCF.value,
+      'order': None,
+    },
+    {
+      'name': im.NOCB.value,
+      'order': None,
+    },
+    {
+      'name': im.NORMAL_UNIT_VARIANCE.value,
+      'order': None,
+    },
   ]
 
 def load_data(path: str, column: str) -> list[float]:
@@ -82,24 +82,28 @@ def load_data(path: str, column: str) -> list[float]:
 
 def save_results(results: pd.DataFrame):
   file_name = f'results_{str(datetime.now())}.csv'.replace(':', '-')
-  path = Path(Path(__file__).parents[0], 'results', file_name)
+  path = Path(Path(__file__).parents[0], 'quality-test-results', file_name)
   results.to_csv(path, index=False)
-
 
 def replace_nan_with_none(x: list[float]):
   x_np = np.array(x)
   x_result = np.where(np.isnan(x_np), None, x_np).tolist()
   return x_result
 
-def rmse(predictions: list[float], targets: list[float]) -> float:
+def RMSE(predictions: list[float], targets: list[float]) -> float:
   predictions_np, targets_np = np.array(predictions), np.array(targets)
 
   return np.sqrt(((predictions_np - targets_np) ** 2).mean())
 
-def mae(predictions: list[float], targets: list[float]) -> float:
+def MAE(predictions: list[float], targets: list[float]) -> float:
   predictions_np, targets_np = np.array(predictions), np.array(targets)
 
   return np.mean(np.abs(targets_np - predictions_np))
+
+def MARE(predictions: list[float], targets: list[float]) -> float:
+  predictions_np, targets_np = np.array(predictions), np.array(targets)
+  return np.mean(np.abs(targets_np - predictions_np) / np.abs(targets_np))
+
 
 def main() -> None:
   data_miss, data_complete = load_data(FILE_PATH, COLUMN_MISS), load_data(FILE_PATH, COLUMN_COMPLETE)
@@ -119,28 +123,25 @@ def main() -> None:
       imputation_results = imp.route(data_miss, method['name'], method['order'])
       end_ms = time.time() * 1000
 
-      plt.plot(imputation_results)
-      plt.plot(data_complete)
-      plt.ylim(25, 30)
-      plt.show()
-
-      print('MAE:', mae(imputation_results, data_complete))
 
       time_diff_ms = end_ms - start_ms
       partial_results['time'].append(time_diff_ms)
-      partial_results['mae'].append(mae(imputation_results, data_complete))
     print(']')
 
-    mean_mae = np.mean(partial_results['mae'])
+
+    mae_result = MAE(imputation_results, data_complete)
+    mare_result = MARE(imputation_results, data_complete)
+    print('mare:', mare_result)
+
     mean_time = np.mean(partial_results['time'])
     std_time = np.std(partial_results['time'])
 
-    results.append([method['name'], method['order'], mean_mae, mean_time, std_time])
+    results.append([method['name'], method['order'], mae_result, mare_result, mean_time, std_time])
     print(f"[FINISH] -> method: {method['name']} - time: {time_diff_ms}")
     if i == 2:
       break
   
-  columns = ['method_name', 'method_order', 'mae', 'mean_exec_time_ms', 'std_time']
+  columns = ['method', 'order', 'MAE', 'MARE', 'time', 'std']
   results_df = pd.DataFrame(results, columns=columns)
   save_results(results_df)
 
