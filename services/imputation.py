@@ -4,8 +4,8 @@ from sklearn.impute import SimpleImputer
 from autoimpute.imputations import SingleImputer
 from my_utils.enums import ImputationStatus, ImputationMethods, SimpleImputationMethods, InterpolationImputationMethods, OtherImputationMethods
 from database.models import ImputationModel
-from uuid import uuid4
-from time import sleep
+
+imputationModel = ImputationModel()
 
 def get_null_values_indexes(data: list[float]) -> list[int]:
   data_df = pd.DataFrame(data)
@@ -130,8 +130,6 @@ def route(data: list[float], method_name: str, method_order: int) -> list[float]
   return imputation_results
 
 def process(job_id: str) -> None:
-  imputationModel = ImputationModel()
-
   imputation = imputationModel.get(job_id)
 
 
@@ -158,15 +156,11 @@ def process(job_id: str) -> None:
   return
 
 def create(time_series: list[float], method: str, order: int | None) -> str:
-
-  imputationModel = ImputationModel()
-
   id = imputationModel.create_imputation(time_series, method, order)
 
   return id
 
 def get(id: str, onlyImputedData: bool = False):
-  imputationModel = ImputationModel()
   result = imputationModel.get(id, onlyImputedData)
 
   return result

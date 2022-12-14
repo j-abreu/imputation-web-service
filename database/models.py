@@ -1,7 +1,6 @@
 import numpy as np
 from . import db
 from my_utils.enums import ImputationStatus
-from uuid import uuid4
 from pymongo import ReturnDocument
 from bson.objectid import ObjectId
 
