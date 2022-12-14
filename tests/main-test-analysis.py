@@ -58,14 +58,16 @@ def get_file_path_list(cur_path):
   return path_list
 
 def main():
+  req_types = ['post_imputation', 'get_imputation']
+
   results = {
-    'create_imputation': {},
-    'get_imputation': {}
+    req_types[0]: {},
+    req_types[1]: {}
   }
 
   for algo in ALGOS:
-    results['create_imputation'][algo] = []
-    results['get_imputation'][algo] = []
+    results[req_types[0]][algo] = []
+    results[req_types[1]][algo] = []
 
     for n_users in N_USERS:
       path = Path(CWD,
@@ -77,34 +79,42 @@ def main():
 
       if path.is_file():
         aggregate_report = pd.read_csv(path)
-        results['create_imputation'][algo].append(np.rint(float(aggregate_report.iloc[CREATE_IMP]['Error %'].replace('%', ''))))
-        results['get_imputation'][algo].append(np.rint(float(aggregate_report.iloc[GET_IMP]['Error %'].replace('%', ''))))
+        results[req_types[0]][algo].append(np.rint(float(aggregate_report.iloc[CREATE_IMP]['Error %'].replace('%', ''))))
+        results[req_types[1]][algo].append(np.rint(float(aggregate_report.iloc[GET_IMP]['Error %'].replace('%', ''))))
 
-  results['create_imputation']['normal_unit_variance'].extend([0,  0])
-  results['get_imputation']['normal_unit_variance'].extend([0, 0])
+  results[req_types[0]]['normal_unit_variance'].extend([0,  0])
+  results[req_types[1]]['normal_unit_variance'].extend([0, 0])
 
-  fig, ax = plt.subplots()
-  bar_width = 0.72
-  x = np.array([10, 20, 30, 40, 50, 60, 70])
 
-  for i, algo in enumerate(ALGOS):
-    rec = ax.bar(x - i*bar_width + (12*bar_width/2-bar_width/2), results['create_imputation'][algo], bar_width, label=algo, color=COLORS[i])
-    ax.bar_label(rec, padding=5, label_type='edge', size=7)
 
-  ax.set_title("Requisições de criação")
-  
-  ax.set_ylabel('Erros (%)')
-  ax.set_xlabel('Número de usuários')
-  ax.set_xticks(x, N_USERS)
-  ax.legend()
-  
+  req_types_chart_title = {
+    req_types[0]: 'Requisições de criação',
+    req_types[1]: 'Requisições de recuperação dos dados'
+  }
 
-  fig.tight_layout()
-  fig.set_size_inches(18.5, 10.5)
+  for req_type in req_types:
+    fig, ax = plt.subplots()
+    bar_width = 0.72
+    x = np.array([10, 20, 30, 40, 50, 60, 70])
 
-  # plt.show()
-  fig_path = str(Path(CWD, '..', 'images', 'jmeter-imputation-creation.png'))
-  plt.savefig(fig_path, dpi=100)
+    for i, algo in enumerate(ALGOS):
+      rec = ax.bar(x - i*bar_width + (12*bar_width/2-bar_width/2), results[req_type][algo], bar_width, label=algo, color=COLORS[i])
+      ax.bar_label(rec, padding=5, label_type='edge', size=7)
+
+    ax.set_title(req_types_chart_title[req_type])
+    
+    ax.set_ylabel('Erro (%)')
+    ax.set_xlabel('Número de usuários')
+    ax.set_xticks(x, N_USERS)
+    ax.legend()
+    
+
+    fig.tight_layout()
+    fig.set_size_inches(18.5, 10.5)
+
+    # plt.show()
+    fig_path = str(Path(CWD, '..', 'images', f'jmeter_{req_type}.png'))
+    plt.savefig(fig_path, dpi=100)
   
 
 if __name__ == '__main__':
