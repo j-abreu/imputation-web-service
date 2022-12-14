@@ -85,7 +85,13 @@ def create_imputation():
 
   job_id = imputation.create(req.time_series, method['name'], method['order'])
 
-  threading.Thread(target=lambda: imputation.process(job_id)).start()
+  imputation_data = {
+    'time_series': req.time_series,
+    'method': method['name'],
+    'order': method['order']
+  }
+
+  threading.Thread(target=lambda: imputation.process(job_id, imputation_data)).start()
 
   res = CreateImputationResp(id=job_id).dict()
 

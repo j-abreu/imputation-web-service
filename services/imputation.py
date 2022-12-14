@@ -129,9 +129,9 @@ def route(data: list[float], method_name: str, method_order: int) -> list[float]
   
   return imputation_results
 
-def process(job_id: str) -> None:
-  imputation = imputationModel.get(job_id)
-
+def process(job_id: str, imputation: dict = None) -> None:
+  if imputation is None:
+    imputation = imputationModel.get(job_id)
 
   method_name = imputation['method']
   method_order = imputation['order']
