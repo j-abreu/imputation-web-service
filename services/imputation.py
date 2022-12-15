@@ -172,7 +172,7 @@ def loop():
       imputation = imputationModel.get_one_created()
 
       if imputation:
-        process(imputation['id'], imputation['time_series'])
+        process(imputation['id'], imputation)
       else:
         sleep(5)
     
