@@ -1,12 +1,10 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request
 from flask_pydantic_spec import FlaskPydanticSpec, Response, Request
-from pydantic_models.Response import GetImputationResp, ErrorResp, CreateImputationResp
+from pydantic_models.Response import GetImputationResp, ErrorResp, CreateImputationResp, InternalServerErrorResp
 from pydantic_models.Request import CreateImputationReq
 from services import imputation
-from my_utils.enums import ImputationStatus, ImputationMethods
+from my_utils.enums import ImputationMethods
 from http import HTTPStatus
-
-import threading
 
 app = Flask(__name__)
 api = FlaskPydanticSpec('imputation-web-service', title='Imputation Web Service')
@@ -18,7 +16,7 @@ def home():
   return "Hello, World!"
 
 @app.get('/imputation/<id>')
-@api.validate(tags=['imputation'], body=None, resp=Response(HTTP_200=GetImputationResp, HTTP_400=ErrorResp, HTTP_404=None))
+@api.validate(tags=['imputation'], body=None, resp=Response(HTTP_200=GetImputationResp, HTTP_400=ErrorResp, HTTP_500=InternalServerErrorResp, HTTP_404=None))
 def get_imputation(id: str):
   """Returns imputed time series based on the given id"""
   if not id:
@@ -35,6 +33,10 @@ def get_imputation(id: str):
 
   if result == None:
     return '', HTTPStatus.NOT_FOUND.value
+
+  if result['error']:
+    res = InternalServerErrorResp(message=result['error']['message'], id=result['id']).dict()
+    return res, HTTPStatus.INTERNAL_SERVER_ERROR
 
   res = GetImputationResp(
     imputed_time_series=result['imputed_time_series'],
@@ -85,13 +87,13 @@ def create_imputation():
 
   job_id = imputation.create(req.time_series, method['name'], method['order'])
 
-  imputation_data = {
-    'time_series': req.time_series,
-    'method': method['name'],
-    'order': method['order']
-  }
+  # imputation_data = {
+  #   'time_series': req.time_series,
+  #   'method': method['name'],
+  #   'order': method['order']
+  # }
 
-  threading.Thread(target=lambda: imputation.process(job_id, imputation_data)).start()
+  # threading.Thread(target=lambda: imputation.process(job_id, imputation_data)).start()
 
   res = CreateImputationResp(id=job_id).dict()
 
