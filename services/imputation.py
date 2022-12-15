@@ -171,7 +171,6 @@ def loop():
       imputation = imputationModel.get_one_created()
 
       if imputation:
-        print('imputation id:', imputation['id'])
         process(imputation['id'], imputation['time_series'])
     
     except Exception as e:
