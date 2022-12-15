@@ -42,7 +42,7 @@
               <stringProp name="Argument.desc">dir to store result files</stringProp>
             </elementProp>
           </collectionProp>
-          <stringProp name="TestPlan.comments">Environment variables</stringProp>
+          <stringProp name="TestPlan.comments">aws machine ip: 172.31.10.42; local ip: 127.0.0.1</stringProp>
         </Arguments>
         <hashTree/>
         <BeanShellSampler guiclass="BeanShellSamplerGui" testclass="BeanShellSampler" testname="Reset Status" enabled="true">
@@ -99,7 +99,7 @@
           <hashTree/>
         </hashTree>
         <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="While Controller" enabled="true">
-          <stringProp name="WhileController.condition">${__javaScript(&quot;${status}&quot;!=&quot;finished&quot; &amp;&amp; &quot;${status}&quot;!=&quot;error&quot; &amp;&amp; &quot;${id}&quot;!=&quot;null&quot;)}</stringProp>
+          <stringProp name="WhileController.condition">${__javaScript(&quot;${status}&quot;!=&quot;finished&quot; &amp;&amp; &quot;${status}&quot;!=&quot;error&quot; &amp;&amp; &quot;${status}&quot;!= &quot;No_Default&quot; &amp;&amp; &quot;${id}&quot;!=&quot;null&quot;)}</stringProp>
         </WhileController>
         <hashTree>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get Imputation" enabled="true">

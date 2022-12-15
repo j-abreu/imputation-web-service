@@ -21,4 +21,3 @@ class ErrorResp(BaseModel):
 
 class InternalServerErrorResp(ErrorResp):
   id: str | None
-  status: str
