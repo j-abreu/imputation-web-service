@@ -130,7 +130,7 @@ class ImputationModel:
   def get_one_created(self):
     result = self.collection.find_one({
       'status': 'created'
-    })
+    }, hint=[('$natural', 1)])
 
     if result:
       return self.add_str_id(result)
