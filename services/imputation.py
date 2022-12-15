@@ -5,8 +5,12 @@ from autoimpute.imputations import SingleImputer
 from my_utils.enums import ImputationStatus, ImputationMethods, SimpleImputationMethods, InterpolationImputationMethods, OtherImputationMethods
 from database.models import ImputationModel
 from time import sleep
+from pynput import keyboard
+import threading
 
 imputationModel = ImputationModel()
+thread_running = False
+imputation_processor = None
 
 def get_null_values_indexes(data: list[float]) -> list[int]:
   data_df = pd.DataFrame(data)
@@ -166,18 +170,57 @@ def get(id: str, onlyImputedData: bool = False):
 
   return result
 
-def loop():
-  while True:
+def run():
+  global thread_running
+
+  print('IMPUTATION PROCESSOR STARTED!')
+
+  while thread_running:
     try:
       imputation = imputationModel.get_one_created()
 
       if imputation:
         process(imputation['id'], imputation)
       else:
-        sleep(5)
+        sleep(1)
     
     except Exception as e:
       try:
         imputationModel.set_error(imputation['id'], str(e))
       except Exception as e:
         imputationModel.set_error(imputation['id'], 'Error on the server while reporting error!')
+
+def on_press(key):
+    global thread_running
+    global imputation_processor
+
+    # press `q` to exit
+    if key == keyboard.KeyCode(char='q'):
+      if imputation_processor:
+        thread_running = False
+        imputation_processor.join()
+        return False
+      else:
+        print('no imputation processor is running!')
+
+def loop():
+  global thread_running
+  global imputation_processor
+
+  try:
+    print("[IMPUTATION PROCESSOR]: Starting...")
+    imputation_processor = threading.Thread(target=run)
+    imputation_processor.start()
+    thread_running = True
+
+    print("[IMPUTATION PROCESSOR]: Starting keyboard listener...")
+    lis = keyboard.Listener(on_press=on_press)
+    lis.start()
+    print("[IMPUTATION PROCESSOR]: Keyboard listener is running...")
+    
+    lis.join()
+    print("[IMPUTATION PROCESSOR]: Exiting...")
+  except KeyboardInterrupt:
+    print("[IMPUTATION PROCESSOR]: Stopped by by Ctrl+C")
+  else:
+    print("[IMPUTATION PROCESSOR]: Stopped by Q key...")

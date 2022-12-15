@@ -5,6 +5,7 @@ from pydantic_models.Request import CreateImputationReq
 from services import imputation
 from my_utils.enums import ImputationMethods
 from http import HTTPStatus
+import threading
 
 app = Flask(__name__)
 api = FlaskPydanticSpec('imputation-web-service', title='Imputation Web Service')
@@ -102,6 +103,10 @@ def create_imputation():
   return res, HTTPStatus.CREATED.value
 
 def main():
+  # Start Imputation Processor
+  threading.Thread(target=imputation.loop).start()
+
+  # Start Flask App
   app.run()
 
 if __name__ == '__main__':
