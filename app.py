@@ -35,7 +35,10 @@ def get_imputation(id: str):
     return '', HTTPStatus.NOT_FOUND.value
 
   if result['error']:
-    res = InternalServerErrorResp(message=result['error']['message'], id=result['id']).dict()
+    res = InternalServerErrorResp(
+      message=result['error']['message'],
+      id=result['id'],
+      status=result['status']).dict()
     return res, HTTPStatus.INTERNAL_SERVER_ERROR
 
   res = GetImputationResp(
