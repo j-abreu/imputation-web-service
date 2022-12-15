@@ -4,6 +4,7 @@ from sklearn.impute import SimpleImputer
 from autoimpute.imputations import SingleImputer
 from my_utils.enums import ImputationStatus, ImputationMethods, SimpleImputationMethods, InterpolationImputationMethods, OtherImputationMethods
 from database.models import ImputationModel
+from time import sleep
 
 imputationModel = ImputationModel()
 
@@ -172,6 +173,8 @@ def loop():
 
       if imputation:
         process(imputation['id'], imputation['time_series'])
+      else:
+        sleep(5)
     
     except Exception as e:
       try:
