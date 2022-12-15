@@ -164,3 +164,18 @@ def get(id: str, onlyImputedData: bool = False):
   result = imputationModel.get(id, onlyImputedData)
 
   return result
+
+def loop():
+  while True:
+    try:
+      imputation = imputationModel.get_one_created()
+
+      if imputation:
+        print('imputation id:', imputation['id'])
+        process(imputation['id'], imputation['time_series'])
+    
+    except Exception as e:
+      try:
+        imputationModel.set_error(imputation['id'], str(e))
+      except Exception as e:
+        imputationModel.set_error(imputation['id'], 'Error on the server while reporting error!')

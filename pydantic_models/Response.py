@@ -18,3 +18,6 @@ class CreateImputationResp(BaseModel):
 
 class ErrorResp(BaseModel):
   message: str
+
+class InternalServerErrorResp(ErrorResp):
+  id: str | None
