@@ -102,7 +102,10 @@ def MAE(predictions: list[float], targets: list[float]) -> float:
 
 def MARE(predictions: list[float], targets: list[float]) -> float:
   predictions_np, targets_np = np.array(predictions), np.array(targets)
-  return np.mean(np.abs(targets_np - predictions_np) / np.abs(targets_np))
+
+  eps = np.finfo(float).eps
+
+  return np.mean(np.abs(targets_np - predictions_np) / np.abs(np.maximum(eps, targets_np)))
 
 
 def main() -> None:
