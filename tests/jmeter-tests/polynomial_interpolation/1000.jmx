@@ -100,7 +100,7 @@
           <hashTree/>
         </hashTree>
         <WhileController guiclass="WhileControllerGui" testclass="WhileController" testname="While Controller" enabled="true">
-          <stringProp name="WhileController.condition">${__javaScript(&quot;${status}&quot;!=&quot;finished&quot; &amp;&amp; &quot;${status}&quot;!=&quot;error&quot; &amp;&amp; &quot;${id}&quot;!=&quot;null&quot;)}</stringProp>
+          <stringProp name="WhileController.condition">${__javaScript(&quot;${status}&quot;!=&quot;finished&quot; &amp;&amp; &quot;${status}&quot;!=&quot;error&quot; &amp;&amp; &quot;${status}&quot;!= &quot;No_Default&quot; &amp;&amp; &quot;${id}&quot;!=&quot;null&quot;)}</stringProp>
         </WhileController>
         <hashTree>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get Imputation" enabled="true">
