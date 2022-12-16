@@ -110,7 +110,7 @@ def main():
   t1.start()
 
   # Start Flask App
-  app.run()
+  app.run(host='0.0.0.0', port=5000)
   is_running = False
   t1.join()
 
