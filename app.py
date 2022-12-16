@@ -6,6 +6,7 @@ from services import imputation
 from my_utils.enums import ImputationMethods
 from http import HTTPStatus
 import threading
+from random import randint
 
 app = Flask(__name__)
 api = FlaskPydanticSpec('imputation-web-service', title='Imputation Web Service')
@@ -105,7 +106,7 @@ def create_imputation():
 def main():
   # Start Imputation Processor
   is_running = True
-  t1 = threading.Thread(target=imputation.loop, args=(1, lambda: is_running))
+  t1 = threading.Thread(target=imputation.loop, args=(randint(0, 999), lambda: is_running))
   t1.start()
 
   # Start Flask App

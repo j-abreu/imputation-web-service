@@ -167,9 +167,10 @@ def get(id: str, onlyImputedData: bool = False):
   return result
 
 def loop(id, is_running):
-  print('IMPUTATION PROCESSOR STARTED!')
+  print('IMPUTATION PROCESSOR STARTED! - id:', id)
   
   while is_running():
+    print('STILL RUNNING:', id)
     try:
       imputation = imputationModel.get_one_created()
 
@@ -183,3 +184,7 @@ def loop(id, is_running):
         imputationModel.set_error(imputation['id'], str(e))
       except Exception as e:
         imputationModel.set_error(imputation['id'], 'Error on the server while reporting error!')
+  
+  print('IMPUTATION PROCESSOR STOPPED! - id:', id)
+
+  return
