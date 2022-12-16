@@ -104,10 +104,14 @@ def create_imputation():
 
 def main():
   # Start Imputation Processor
-  threading.Thread(target=imputation.loop).start()
+  is_running = True
+  t1 = threading.Thread(target=imputation.loop, args=(1, lambda: is_running))
+  t1.start()
 
   # Start Flask App
   app.run()
+  is_running = False
+  t1.join()
 
 if __name__ == '__main__':
   main()
