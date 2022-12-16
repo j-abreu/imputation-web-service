@@ -8,6 +8,10 @@ from http import HTTPStatus
 import threading
 from random import randint
 from multiprocessing import Process
+import logging
+
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 
 app = Flask(__name__)
 api = FlaskPydanticSpec('imputation-web-service', title='Imputation Web Service')
@@ -23,6 +27,7 @@ def home():
 def get_imputation(id: str):
   """Returns imputed time series based on the given id"""
   if not id:
+    print('[NOT FOUND 404]')
     return '', HTTPStatus.NOT_FOUND.value
 
   onlyImputedData = request.args.get('onlyImputed')
@@ -35,12 +40,15 @@ def get_imputation(id: str):
   result = imputation.get(id, onlyImputedData)
 
   if result == None:
+    print('[NOT FOUND 404]')
     return '', HTTPStatus.NOT_FOUND.value
 
   if result['error']:
     res = InternalServerErrorResp(
       message=result['error']['message'],
       id=result['id']).dict()
+    
+    print('[INTERAL SERVER ERROR 500]')
     return res, HTTPStatus.INTERNAL_SERVER_ERROR
 
   res = GetImputationResp(
@@ -64,6 +72,8 @@ def create_imputation():
 
   if req.method not in [method.value for method in ImputationMethods]:
     res = ErrorResp(message='Invalid method').dict()
+
+    print('[BAD REQUEST 400]')
     return res, HTTPStatus.BAD_REQUEST.value
 
   method_with_order = [ImputationMethods.SPLINE.value, ImputationMethods.POLYNOMIAL.value]
@@ -73,16 +83,22 @@ def create_imputation():
   if req.method in method_with_order:
     if req.order is None:
       res = ErrorResp(message='This method requires an order argument').dict()
+
+      print('[BAD REQUEST 400]')
       return res, HTTPStatus.BAD_REQUEST.value
     
     if req.order in allowed_orders:
       method_order = req.order
     else:
       res = ErrorResp(message=f'Order must in {allowed_orders}').dict()
+
+      print('[BAD REQUEST 400]')
       return res, HTTPStatus.BAD_REQUEST.value
 
   if len(req.time_series) == 0: 
     res = ErrorResp(message='Empty time series').dict()
+    
+    print('[BAD REQUEST 400]')
     return res, HTTPStatus.BAD_REQUEST.value
 
   method = {
