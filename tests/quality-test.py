@@ -190,19 +190,19 @@ def main() -> None:
     print(']')
 
 
-    mae_result = MAE(imputation_results, data_complete)
-    mare_result = MARE(imputation_results, data_complete)
-    print('mare:', mare_result)
+    mae_result = np.round(MAE(imputation_results, data_complete), 5)
+    # mare_result = MARE(imputation_results, data_complete)
+    # print('mare:', mare_result)
 
-    mean_time = np.mean(partial_results['time'])
-    std_time = np.std(partial_results['time'])
+    mean_time = np.round(np.mean(partial_results['time']), 5)
+    std_time = np.round(np.std(partial_results['time']), 5)
 
-    results.append([method['name'], method['order'], mae_result, mare_result, mean_time, std_time])
+    results.append([method['name'], method['order'], mae_result, mean_time, std_time])
     print(f"[FINISH] -> method: {method['name']} - time: {time_diff_ms}")
     if i == 2:
       break
   
-  columns = ['method', 'order', 'MAE', 'MARE', 'time', 'std']
+  columns = ['method', 'order', 'MAE', 'time', 'std']
   results_df = pd.DataFrame(results, columns=columns)
   save_results(results_df)
 
