@@ -17,7 +17,7 @@ CWD = Path(__file__).parents[0]
 FILE_PATH = './data/daily-temperature.csv'
 COLUMN_COMPLETE = 'temp'
 COLUMN_MISS = 'temp_miss'
-NUM_RUNS = 30
+NUM_RUNS = 100
 # TODO: Verify time interpolation method error
 METHODS = [
     {
@@ -74,6 +74,12 @@ METHODS = [
     },
   ]
 
+colors = {
+  'blue': '#557ad8',
+  'green': '#40f91f',
+  'red': '#f93f3f'
+}
+
 def load_data(path: str, column: str) -> list[float]:
   path = Path(CWD, path)
   data = pd.read_csv(path)
@@ -106,6 +112,58 @@ def MARE(predictions: list[float], targets: list[float]) -> float:
   eps = np.finfo(float).eps
 
   return np.mean(np.abs(targets_np - predictions_np) / np.abs(np.maximum(eps, targets_np)))
+
+def get_only_missing(data_miss, data_complete):
+  only_missing = []
+  for i in range(len(data_complete)):
+    if not data_miss[i]:
+      only_missing.append(data_complete[i])
+    else:
+      only_missing.append(None)
+  
+  return only_missing
+
+def plot_time_series(data_miss, data_complete):
+  data_miss = replace_nan_with_none(data_miss)
+  only_missing = get_only_missing(data_miss, data_complete)
+
+  plt.figure(figsize=(10, 6), dpi=100)
+
+  # plot missing
+  plt.plot(np.arange(len(data_complete)), data_complete, marker='None', color=colors['blue'])
+  plt.plot(np.arange(len(data_miss)), data_miss, marker='.', color=colors['blue'], linestyle = 'None', label='Valor conhecido')
+  plt.plot(np.arange(len(only_missing)), only_missing, marker='x', color=colors['red'], linestyle = 'None', label='Valor removido')
+  plt.xlabel('Dias')
+  plt.ylabel('Temperatura (°C)')
+  plt.legend()
+  plt.tight_layout(pad=2)
+  plt.title('Temperatura média em Belém-PA ao longo dos dias com valores faltantes')
+
+  fig_path = str(Path(CWD, '..', 'images', f'daily_temperature.png'))
+  plt.savefig(fig_path, dpi=100)
+
+  # plot imputed points
+  imputation_results = imp.route(data_miss, 'linear interpolation', None)
+  only_imputed = get_only_missing(data_miss, imputation_results)
+
+
+  plt.figure(figsize=(10, 6), dpi=100)
+
+  plt.plot(np.arange(len(data_complete)), data_complete, marker='None', color=colors['blue'])
+  plt.plot(np.arange(len(data_miss)), data_miss, marker='.', color=colors['blue'], linestyle = 'None', label='Valor conhecido')
+  plt.plot(np.arange(len(only_missing)), only_missing, marker='x', color=colors['red'], linestyle = 'None', label='Valor removido')
+  # plt.plot(np.arange(len(imputation_results)), imputation_results, marker='None', markeredgecolor=colors['green'], markerfacecolor=colors['green'], color=colors['blue'], linestyle = '--', linewidth=1)
+  plt.plot(np.arange(len(only_imputed)), only_imputed, marker='d', color=colors['green'], linestyle = 'None', label='Valor imputado usando Linear Interpolation')
+  plt.xlabel('Dias')
+  plt.ylabel('Temperatura (°C)')
+  plt.legend()
+  plt.tight_layout(pad=2)
+
+  plt.title('Temperatura média em Belém-PA ao longo dos dias com valores imputados')
+
+  fig_path = str(Path(CWD, '..', 'images', f'imputed_temperature.png'))
+  plt.savefig(fig_path, dpi=100)
+
 
 
 def main() -> None:

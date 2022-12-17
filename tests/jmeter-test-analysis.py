@@ -7,8 +7,8 @@ import matplotlib.colors as mcolors
 
 CWD = Path(__file__).parents[0]
 ALGOS = [
-  # 'normal_unit_variance',
-  # 'barycentric_interpolation',
+  'normal_unit_variance',
+  'barycentric_interpolation',
   'polynomial_interpolation',
   'mode',
   'random',
@@ -34,12 +34,12 @@ COLORS = [
   mcolors.CSS4_COLORS['steelblue'],
   mcolors.CSS4_COLORS['crimson']
 ]
-N_USERS = [1000, 1500, 2500, 3500, 4000]
+N_USERS = [1000, 2000, 4000, 6000, 10000]
 CREATE_IMP = 1
 GET_IMP = 2
 
 
-RESULTS_DIR = Path(CWD, 'results')
+RESULTS_DIR = Path(CWD, 'results', 'version_B')
 
 def ff(item):
   print(item)
@@ -65,7 +65,7 @@ def get_last_column():
   return rows
 
 def boxplot(results):
-  cols = ['algorithm', 'number_of_users', 'avg_time_ms']
+  cols = ['Algoritmo', 'Número de Usuários', 'Tempo Médio (ms)']
   get_results_np = np.array([]).reshape(0, len(cols))
   post_results_np = np.array([]).reshape(0, len(cols))
 
@@ -83,20 +83,33 @@ def boxplot(results):
   get_results_df = pd.DataFrame(get_results_np, columns=cols)
   post_results_df = pd.DataFrame(post_results_np, columns=cols)
 
-  get_results_df['avg_time_ms'] = get_results_df['avg_time_ms'].astype('float')
-  get_results_df['number_of_users'] = get_results_df['avg_time_ms'].astype('float')
+  get_results_df['Tempo Médio (ms)'] = get_results_df['Tempo Médio (ms)'].astype('float')
+  get_results_df['Número de Usuários'] = get_results_df['Tempo Médio (ms)'].astype('float')
 
-  post_results_df['avg_time_ms'] = get_results_df['avg_time_ms'].astype('float')
-  post_results_df['number_of_users'] = get_results_df['avg_time_ms'].astype('float')
+  post_results_df['Tempo Médio (ms)'] = post_results_df['Tempo Médio (ms)'].astype('float')
+  post_results_df['Número de Usuários'] = post_results_df['Tempo Médio (ms)'].astype('float')
 
-  boxplot = get_results_df.boxplot(by='algorithm', column=['avg_time_ms'], grid=False, rot=45, fontsize=15, figsize=(30, 14))
+  boxplot_get = get_results_df.boxplot(by='Algoritmo', column=['Tempo Médio (ms)'], grid=False, rot=20, fontsize=15, figsize=(30, 14))
+  boxplot_get.set_ylabel('Tempo Médio (ms)', fontsize=20)
+  boxplot_get.set_xlabel('Algoritmos', fontsize=20)
+  boxplot_get.set_title('Tempo Médio em Milissegundos por Algoritmo para Requisições de Recuperação')
+  boxplot_get.title.set_size(20)
 
-  fig_path = str(Path(CWD, '..', 'images', f'jmeter_avg_time_boxplot.png'))
+  fig_path_get = str(Path(CWD, '..', 'images', f'get_imputation_boxplot_all_algos.png'))
 
-  fig = boxplot.get_figure()
-  fig.savefig(fig_path)
+  fig_get = boxplot_get.get_figure()
+  fig_get.savefig(fig_path_get)
 
+  boxplot_post = post_results_df.boxplot(by='Algoritmo', column=['Tempo Médio (ms)'], grid=False, rot=20, fontsize=15, figsize=(30, 14))
+  boxplot_post.set_ylabel('Tempo Médio (ms)', fontsize=20)
+  boxplot_post.set_xlabel('Algoritmos', fontsize=20)
+  boxplot_post.set_title('Tempo Médio em Milissegundos por Algoritmo para Requisições de Criação')
+  boxplot_post.title.set_size(20)
 
+  fig_path_post = str(Path(CWD, '..', 'images', f'post_imputation_boxplot_all_algos.png'))
+
+  fig_post = boxplot_post.get_figure()
+  fig_post.savefig(fig_path_post)
 
 def main():
   req_types = ['post_imputation', 'get_imputation']
@@ -113,6 +126,7 @@ def main():
     for algo in ALGOS:
       path = Path(CWD,
         'jmeter-results',
+        'version_B',
         algo,
         f'{n_users}',
         'aggregate-results.csv'
@@ -122,9 +136,6 @@ def main():
         aggregate_report = pd.read_csv(path)
         results[req_types[0]][n_users].append(int(aggregate_report.iloc[CREATE_IMP]['Average']))
         results[req_types[1]][n_users].append(int(aggregate_report.iloc[GET_IMP]['Average']))
-
-  boxplot(results)
-  return
 
   req_types_chart_title = {
     req_types[0]: 'Requisições de criação',
