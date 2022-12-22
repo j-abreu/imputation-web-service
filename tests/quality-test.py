@@ -44,10 +44,10 @@ METHODS = [
       'name': im.SPLINE.value,
       'order': 3,
     },
-    {
-      'name': im.BARYCENTRIC.value,
-      'order': None,
-    },
+    # {
+    #   'name': im.BARYCENTRIC.value,
+    #   'order': None,
+    # },
     {
       'name': im.POLYNOMIAL.value,
       'order': 3,
@@ -164,9 +164,49 @@ def plot_time_series(data_miss, data_complete):
   fig_path = str(Path(CWD, '..', 'images', f'imputed_temperature.png'))
   plt.savefig(fig_path, dpi=100)
 
+def plot_time_series_for_presentation(data_miss, data_complete):
+  data_miss = replace_nan_with_none(data_miss)
+  only_missing = get_only_missing(data_miss, data_complete)
+
+  plt.figure(figsize=(10, 6), dpi=100)
+
+  # plot missing
+  plt.plot(np.arange(len(data_complete)), data_complete, marker='.', color=colors['green'])
+  plt.plot(np.arange(len(data_miss)), data_miss, marker='.', color=colors['blue'])
+  plt.tight_layout(pad=1)
+  plt.title('')
+
+  plt.xticks([])
+  plt.yticks([])
+
+  fig_path = str(Path(CWD, '..', 'images', f'time_series_imputed.png'))
+  plt.savefig(fig_path, dpi=100)
+
+def scatter():
+  results = pd.read_csv(Path(CWD, 'quality-test-results', 'results_2022-12-17 18-02-59.629625.csv'), index_col='method')
+  plt.figure(figsize=(10, 6), dpi=100)
+  for method in METHODS:
+    if method['name'] == 'normal unit variance':
+      plt.scatter(results.loc[method['name']]['MAE'], results.loc[method['name']]['time'], label=method['name'], color='#000000')
+    else:
+      plt.scatter(results.loc[method['name']]['MAE'], results.loc[method['name']]['time'], label=method['name'])
+  
+  plt.legend()
+  plt.title('Gráfico de dispersão do MAE e do Tempo médio para cada algoritmo de imputação')
+  plt.xlabel('Erro Médio Absoluto (MAE)')
+  plt.ylabel('Tempo médio (ms)')
+  plt.xlim((0, 0.15))
+  plt.tight_layout(pad=2)
+
+  fig_path = str(Path(CWD, '..', 'images', f'scater-plot.png'))
+  plt.savefig(fig_path, dpi=120)
 
 
 def main() -> None:
+  data_miss, data_complete = load_data(FILE_PATH, COLUMN_MISS), load_data(FILE_PATH, COLUMN_COMPLETE)
+  plot_time_series_for_presentation(data_miss, data_complete)
+  return
+  scatter()
   data_miss, data_complete = load_data(FILE_PATH, COLUMN_MISS), load_data(FILE_PATH, COLUMN_COMPLETE)
 
   results = []
