@@ -1,0 +1,13 @@
+method,order,MAE,time,std
+linear interpolation,,0.39389,2.09985,0.09569
+most frequent,,0.46771,0.46978,0.03457
+mode,,0.46771,1.74368,0.03434
+locf,,0.47449,1.81909,0.02869
+median,,0.54618,0.62262,0.02913
+polynomial interpolation,3.0,0.54806,2.47744,0.06367
+spline interpolation,3.0,0.58265,2.2254,0.05338
+mean,,0.62909,0.46683,0.04492
+nocb,,0.79088,1.83128,0.02193
+random,,0.78318,1.83878,0.03628
+normal unit variance,,0.92703,6.66171,0.30798
+barycentric interpolation,,45913223802355.43,3.22195,0.0659

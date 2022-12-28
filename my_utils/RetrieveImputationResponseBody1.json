@@ -1,0 +1,9 @@
+{
+  "id": "639c1ce20349e98f663e31bc",
+  "imputed_time_series": [1.75, 1.75],
+  "imputed_indexes": [ 1, 3 ],
+  "method": "mean",
+  "only_imputed_data": true,
+  "order": null,
+  "status": "finished"
+}

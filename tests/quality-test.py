@@ -17,7 +17,7 @@ CWD = Path(__file__).parents[0]
 FILE_PATH = './data/daily-temperature.csv'
 COLUMN_COMPLETE = 'temp'
 COLUMN_MISS = 'temp_miss'
-NUM_RUNS = 30
+NUM_RUNS = 1
 # TODO: Verify time interpolation method error
 METHODS = [
     {
@@ -44,10 +44,10 @@ METHODS = [
       'name': im.SPLINE.value,
       'order': 3,
     },
-    {
-      'name': im.BARYCENTRIC.value,
-      'order': None,
-    },
+    # {
+    #   'name': im.BARYCENTRIC.value,
+    #   'order': None,
+    # },
     {
       'name': im.POLYNOMIAL.value,
       'order': 3,
@@ -74,6 +74,12 @@ METHODS = [
     },
   ]
 
+colors = {
+  'blue': '#557ad8',
+  'green': '#40f91f',
+  'red': '#f93f3f'
+}
+
 def load_data(path: str, column: str) -> list[float]:
   path = Path(CWD, path)
   data = pd.read_csv(path)
@@ -96,7 +102,7 @@ def RMSE(predictions: list[float], targets: list[float]) -> float:
   return np.sqrt(((predictions_np - targets_np) ** 2).mean())
 
 def MAE(predictions: list[float], targets: list[float]) -> float:
-  predictions_np, targets_np = np.array(predictions), np.array(targets)
+  predictions_np, targets_np = np.array(predictions, dtype=np.float), np.array(targets, dtype=np.float)
 
   return np.mean(np.abs(targets_np - predictions_np))
 
@@ -107,8 +113,109 @@ def MARE(predictions: list[float], targets: list[float]) -> float:
 
   return np.mean(np.abs(targets_np - predictions_np) / np.abs(np.maximum(eps, targets_np)))
 
+def reverse_missing_data(data_miss, data_complete):
+  only_missing = []
+  for i in range(len(data_complete)):
+    if not data_miss[i]:
+      only_missing.append(data_complete[i])
+    else:
+      only_missing.append(None)
+  
+  return only_missing
+
+def get_only_missing_data(data_miss, data_complete):
+  only_missing = []
+  for i in range(len(data_complete)):
+    if not data_miss[i]:
+      only_missing.append(data_complete[i])
+  
+  return only_missing
+
+def plot_time_series(data_miss, data_complete):
+  data_miss = replace_nan_with_none(data_miss)
+  only_missing = reverse_missing_data(data_miss, data_complete)
+
+  plt.figure(figsize=(10, 6), dpi=100)
+
+  # plot missing
+  plt.plot(np.arange(len(data_complete)), data_complete, marker='None', color=colors['blue'])
+  plt.plot(np.arange(len(data_miss)), data_miss, marker='.', color=colors['blue'], linestyle = 'None', label='Valor conhecido')
+  plt.plot(np.arange(len(only_missing)), only_missing, marker='x', color=colors['red'], linestyle = 'None', label='Valor removido')
+  plt.xlabel('Dias')
+  plt.ylabel('Temperatura (°C)')
+  plt.legend()
+  plt.tight_layout(pad=2)
+  plt.title('Temperatura média em Belém-PA ao longo dos dias com valores faltantes')
+
+  fig_path = str(Path(CWD, '..', 'images', f'daily_temperature.png'))
+  plt.savefig(fig_path, dpi=100)
+
+  # plot imputed points
+  imputation_results = imp.route(data_miss, 'linear interpolation', None)
+  only_imputed = reverse_missing_data(data_miss, imputation_results)
+
+
+  plt.figure(figsize=(10, 6), dpi=100)
+
+  plt.plot(np.arange(len(data_complete)), data_complete, marker='None', color=colors['blue'])
+  plt.plot(np.arange(len(data_miss)), data_miss, marker='.', color=colors['blue'], linestyle = 'None', label='Valor conhecido')
+  plt.plot(np.arange(len(only_missing)), only_missing, marker='x', color=colors['red'], linestyle = 'None', label='Valor removido')
+  # plt.plot(np.arange(len(imputation_results)), imputation_results, marker='None', markeredgecolor=colors['green'], markerfacecolor=colors['green'], color=colors['blue'], linestyle = '--', linewidth=1)
+  plt.plot(np.arange(len(only_imputed)), only_imputed, marker='d', color=colors['green'], linestyle = 'None', label='Valor imputado usando Linear Interpolation')
+  plt.xlabel('Dias')
+  plt.ylabel('Temperatura (°C)')
+  plt.legend()
+  plt.tight_layout(pad=2)
+
+  plt.title('Temperatura média em Belém-PA ao longo dos dias com valores imputados')
+
+  fig_path = str(Path(CWD, '..', 'images', f'imputed_temperature.png'))
+  plt.savefig(fig_path, dpi=100)
+
+def plot_time_series_for_presentation(data_miss, data_complete):
+  data_miss = replace_nan_with_none(data_miss)
+  only_missing = reverse_missing_data(data_miss, data_complete)
+
+  plt.figure(figsize=(10, 6), dpi=100)
+
+  # plot missing
+  plt.plot(np.arange(len(data_complete)), data_complete, marker='.', color=colors['green'])
+  plt.plot(np.arange(len(data_miss)), data_miss, marker='.', color=colors['blue'])
+  plt.tight_layout(pad=1)
+  plt.title('')
+
+  plt.xticks([])
+  plt.yticks([])
+
+  fig_path = str(Path(CWD, '..', 'images', f'time_series_imputed.png'))
+  plt.savefig(fig_path, dpi=100)
+
+def scatter():
+  results = pd.read_csv(Path(CWD, 'quality-test-results', 'results_2022-12-17 18-02-59.629625.csv'), index_col='method')
+  plt.figure(figsize=(10, 6), dpi=100)
+  for method in METHODS:
+    if method['name'] == 'normal unit variance':
+      plt.scatter(results.loc[method['name']]['MAE'], results.loc[method['name']]['time'], label=method['name'], color='#000000')
+    else:
+      plt.scatter(results.loc[method['name']]['MAE'], results.loc[method['name']]['time'], label=method['name'])
+  
+  plt.legend()
+  plt.title('Gráfico de dispersão do MAE e do Tempo médio para cada algoritmo de imputação')
+  plt.xlabel('Erro Médio Absoluto (MAE)')
+  plt.ylabel('Tempo médio (ms)')
+  plt.xlim((0, 1))
+  plt.tight_layout(pad=2)
+
+  fig_path = str(Path(CWD, '..', 'images', f'scater-plot.png'))
+  plt.savefig(fig_path, dpi=120)
+
 
 def main() -> None:
+  # data_miss, data_complete = load_data(FILE_PATH, COLUMN_MISS), load_data(FILE_PATH, COLUMN_COMPLETE)
+  # plot_time_series_for_presentation(data_miss, data_complete)
+  # return
+  scatter()
+  return
   data_miss, data_complete = load_data(FILE_PATH, COLUMN_MISS), load_data(FILE_PATH, COLUMN_COMPLETE)
 
   results = []
@@ -131,20 +238,23 @@ def main() -> None:
       partial_results['time'].append(time_diff_ms)
     print(']')
 
+    data_miss_2 = replace_nan_with_none(data_miss)
+    imputation_results_filtered = get_only_missing_data(data_miss_2, imputation_results)
+    data_complete_filtered = get_only_missing_data(data_miss_2, data_complete)
 
-    mae_result = MAE(imputation_results, data_complete)
-    mare_result = MARE(imputation_results, data_complete)
-    print('mare:', mare_result)
+    mae_result = np.round(MAE(imputation_results_filtered, data_complete_filtered), 5)
+    # mare_result = MARE(imputation_results, data_complete)
+    # print('mare:', mare_result)
 
-    mean_time = np.mean(partial_results['time'])
-    std_time = np.std(partial_results['time'])
+    mean_time = np.round(np.mean(partial_results['time']), 5)
+    std_time = np.round(np.std(partial_results['time']), 5)
 
-    results.append([method['name'], method['order'], mae_result, mare_result, mean_time, std_time])
+    results.append([method['name'], method['order'], mae_result, mean_time, std_time])
     print(f"[FINISH] -> method: {method['name']} - time: {time_diff_ms}")
     if i == 2:
       break
   
-  columns = ['method', 'order', 'MAE', 'MARE', 'time', 'std']
+  columns = ['method', 'order', 'MAE', 'time', 'std']
   results_df = pd.DataFrame(results, columns=columns)
   save_results(results_df)
 
