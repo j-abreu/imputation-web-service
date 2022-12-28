@@ -7,7 +7,7 @@ import matplotlib.colors as mcolors
 
 CWD = Path(__file__).parents[0]
 ALGOS = [
-  'normal_unit_variance',
+  # 'normal_unit_variance',
   'barycentric_interpolation',
   'polynomial_interpolation',
   'mode',
@@ -89,24 +89,26 @@ def boxplot(results):
   post_results_df['Tempo Médio (ms)'] = post_results_df['Tempo Médio (ms)'].astype('float')
   post_results_df['Número de Usuários'] = post_results_df['Tempo Médio (ms)'].astype('float')
 
-  boxplot_get = get_results_df.boxplot(by='Algoritmo', column=['Tempo Médio (ms)'], grid=False, rot=20, fontsize=15, figsize=(30, 14))
-  boxplot_get.set_ylabel('Tempo Médio (ms)', fontsize=20)
-  boxplot_get.set_xlabel('Algoritmos', fontsize=20)
+  boxplot_get = get_results_df.boxplot(by='Algoritmo', column=['Tempo Médio (ms)'], grid=False, rot=60, fontsize=35, figsize=(30, 18))
+  boxplot_get.set_ylabel('Tempo Médio (ms)', fontsize=35)
+  boxplot_get.set_xlabel('Algoritmos', fontsize=35)
   boxplot_get.set_title('Tempo Médio em Milissegundos por Algoritmo para Requisições de Recuperação')
-  boxplot_get.title.set_size(20)
+  boxplot_get.title.set_size(30)
+  plt.tight_layout(pad=2)
 
-  fig_path_get = str(Path(CWD, '..', 'images', f'get_imputation_boxplot_all_algos.png'))
+  fig_path_get = str(Path(CWD, '..', 'images', f'get_boxplot.png'))
 
   fig_get = boxplot_get.get_figure()
   fig_get.savefig(fig_path_get)
 
-  boxplot_post = post_results_df.boxplot(by='Algoritmo', column=['Tempo Médio (ms)'], grid=False, rot=20, fontsize=15, figsize=(30, 14))
-  boxplot_post.set_ylabel('Tempo Médio (ms)', fontsize=20)
-  boxplot_post.set_xlabel('Algoritmos', fontsize=20)
+  boxplot_post = post_results_df.boxplot(by='Algoritmo', column=['Tempo Médio (ms)'], grid=False, rot=60, fontsize=35, figsize=(30, 18))
+  boxplot_post.set_ylabel('Tempo Médio (ms)', fontsize=35)
+  boxplot_post.set_xlabel('Algoritmos', fontsize=35)
   boxplot_post.set_title('Tempo Médio em Milissegundos por Algoritmo para Requisições de Criação')
-  boxplot_post.title.set_size(20)
+  boxplot_post.title.set_size(30)
+  plt.tight_layout(pad=2)
 
-  fig_path_post = str(Path(CWD, '..', 'images', f'post_imputation_boxplot_all_algos.png'))
+  fig_path_post = str(Path(CWD, '..', 'images', f'post_boxplot.png'))
 
   fig_post = boxplot_post.get_figure()
   fig_post.savefig(fig_path_post)
@@ -141,6 +143,9 @@ def main():
     req_types[0]: 'Requisições de criação',
     req_types[1]: 'Requisições de recuperação dos dados'
   }
+
+  boxplot(results)
+  return
 
   for req_type in req_types:
     fig, ax = plt.subplots()

@@ -1,0 +1,4 @@
+{
+  "time_series": [1.2, null, 1.6, null, 2, 2.2],
+  "method": "mean"
+}

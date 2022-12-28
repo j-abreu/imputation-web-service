@@ -17,7 +17,7 @@ CWD = Path(__file__).parents[0]
 FILE_PATH = './data/daily-temperature.csv'
 COLUMN_COMPLETE = 'temp'
 COLUMN_MISS = 'temp_miss'
-NUM_RUNS = 100
+NUM_RUNS = 1
 # TODO: Verify time interpolation method error
 METHODS = [
     {
@@ -102,7 +102,7 @@ def RMSE(predictions: list[float], targets: list[float]) -> float:
   return np.sqrt(((predictions_np - targets_np) ** 2).mean())
 
 def MAE(predictions: list[float], targets: list[float]) -> float:
-  predictions_np, targets_np = np.array(predictions), np.array(targets)
+  predictions_np, targets_np = np.array(predictions, dtype=np.float), np.array(targets, dtype=np.float)
 
   return np.mean(np.abs(targets_np - predictions_np))
 
@@ -113,7 +113,7 @@ def MARE(predictions: list[float], targets: list[float]) -> float:
 
   return np.mean(np.abs(targets_np - predictions_np) / np.abs(np.maximum(eps, targets_np)))
 
-def get_only_missing(data_miss, data_complete):
+def reverse_missing_data(data_miss, data_complete):
   only_missing = []
   for i in range(len(data_complete)):
     if not data_miss[i]:
@@ -123,9 +123,17 @@ def get_only_missing(data_miss, data_complete):
   
   return only_missing
 
+def get_only_missing_data(data_miss, data_complete):
+  only_missing = []
+  for i in range(len(data_complete)):
+    if not data_miss[i]:
+      only_missing.append(data_complete[i])
+  
+  return only_missing
+
 def plot_time_series(data_miss, data_complete):
   data_miss = replace_nan_with_none(data_miss)
-  only_missing = get_only_missing(data_miss, data_complete)
+  only_missing = reverse_missing_data(data_miss, data_complete)
 
   plt.figure(figsize=(10, 6), dpi=100)
 
@@ -144,7 +152,7 @@ def plot_time_series(data_miss, data_complete):
 
   # plot imputed points
   imputation_results = imp.route(data_miss, 'linear interpolation', None)
-  only_imputed = get_only_missing(data_miss, imputation_results)
+  only_imputed = reverse_missing_data(data_miss, imputation_results)
 
 
   plt.figure(figsize=(10, 6), dpi=100)
@@ -166,7 +174,7 @@ def plot_time_series(data_miss, data_complete):
 
 def plot_time_series_for_presentation(data_miss, data_complete):
   data_miss = replace_nan_with_none(data_miss)
-  only_missing = get_only_missing(data_miss, data_complete)
+  only_missing = reverse_missing_data(data_miss, data_complete)
 
   plt.figure(figsize=(10, 6), dpi=100)
 
@@ -195,7 +203,7 @@ def scatter():
   plt.title('Gráfico de dispersão do MAE e do Tempo médio para cada algoritmo de imputação')
   plt.xlabel('Erro Médio Absoluto (MAE)')
   plt.ylabel('Tempo médio (ms)')
-  plt.xlim((0, 0.15))
+  plt.xlim((0, 1))
   plt.tight_layout(pad=2)
 
   fig_path = str(Path(CWD, '..', 'images', f'scater-plot.png'))
@@ -203,10 +211,11 @@ def scatter():
 
 
 def main() -> None:
-  data_miss, data_complete = load_data(FILE_PATH, COLUMN_MISS), load_data(FILE_PATH, COLUMN_COMPLETE)
-  plot_time_series_for_presentation(data_miss, data_complete)
-  return
+  # data_miss, data_complete = load_data(FILE_PATH, COLUMN_MISS), load_data(FILE_PATH, COLUMN_COMPLETE)
+  # plot_time_series_for_presentation(data_miss, data_complete)
+  # return
   scatter()
+  return
   data_miss, data_complete = load_data(FILE_PATH, COLUMN_MISS), load_data(FILE_PATH, COLUMN_COMPLETE)
 
   results = []
@@ -229,8 +238,11 @@ def main() -> None:
       partial_results['time'].append(time_diff_ms)
     print(']')
 
+    data_miss_2 = replace_nan_with_none(data_miss)
+    imputation_results_filtered = get_only_missing_data(data_miss_2, imputation_results)
+    data_complete_filtered = get_only_missing_data(data_miss_2, data_complete)
 
-    mae_result = np.round(MAE(imputation_results, data_complete), 5)
+    mae_result = np.round(MAE(imputation_results_filtered, data_complete_filtered), 5)
     # mare_result = MARE(imputation_results, data_complete)
     # print('mare:', mare_result)
 
