@@ -93,7 +93,7 @@ def boxplot(results):
   boxplot_get.set_ylabel('Tempo Médio (ms)', fontsize=35)
   boxplot_get.set_xlabel('Algoritmo', fontsize=35)
   boxplot_get.set_title('Tempo Médio em Milissegundos por Algoritmo para Requisições de Recuperação')
-  boxplot_post.set_ylim([13, 30])
+  boxplot_get.set_ylim([13, 30])
   boxplot_get.title.set_size(30)
   plt.tight_layout(pad=2)
 
